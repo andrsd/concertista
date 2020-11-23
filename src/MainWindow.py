@@ -9,6 +9,7 @@ import random
 from PyQt5 import QtWidgets, QtCore
 import consts
 from AboutDialog import AboutDialog
+from DeveloperWindow import DeveloperWindow
 
 class MainWindow(QtWidgets.QMainWindow):
     """
@@ -19,6 +20,8 @@ class MainWindow(QtWidgets.QMainWindow):
         super().__init__()
         # database
         self._db = None
+        # market for spotify
+        self._market = 'US'
         # Spotify object
         self._spotify = None
         # my Spotify profile
@@ -29,6 +32,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._active_device_id = None
         self._settings = QtCore.QSettings()
         self._about_dlg = None
+        self._developer_window = None
 
         self.readSettings()
         self.setupWidgets()
@@ -79,6 +83,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.station_menu = self.menubar.addMenu("Station")
         self._new_station = self.station_menu.addAction("New", self.onNewStation, "Ctrl+N")
+        self.station_menu.addSeparator()
+        self._developer = self.station_menu.addAction("Developer", self.onDeveloper, "Ctrl+Alt+I")
 
         # The "About" item is fine here, since we assume Mac and that will place the item into
         # different submenu but this will need to be fixed for linux and windows
@@ -139,6 +145,15 @@ class MainWindow(QtWidgets.QMainWindow):
             if max_tracks == 0:
                 break
         self._spotify.start_playback(device_id=self._active_device_id, uris=uris)
+
+    def onDeveloper(self):
+        """
+        Open developer GUI
+        """
+        if self._developer_window is None:
+            self._developer_window = DeveloperWindow()
+            self._developer_window.setupSpotify(self._spotify, self._market)
+        self._developer_window.show()
 
     def onPlayPause(self):
         """
