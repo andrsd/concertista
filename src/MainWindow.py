@@ -45,6 +45,14 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         self.menubar = QtWidgets.QMenuBar(self)
 
+        self.station_menu = self.menubar.addMenu("Station")
+        self._new_station = self.station_menu.addAction("New", self.onNewStation, "Ctrl+N")
+
+        # The "About" item is fine here, since we assume Mac and that will place the item into
+        # different submenu but this will need to be fixed for linux and windows
+        self.station_menu.addSeparator()
+        self._about_box_action = self.station_menu.addAction("About", self.onAbout)
+
         self.controls_menu = self.menubar.addMenu("Controls")
         self._play_pause = self.controls_menu.addAction("Play", self.onPlayPause, "Space")
         self._stop = self.controls_menu.addAction("Stop", self.onStop, "Ctrl+.")
@@ -54,11 +62,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self._volume_up = self.controls_menu.addAction("Increase Volume", self.onVolumeUp, "Ctrl+Up")
         self._volume_down = self.controls_menu.addAction("Decrease Volume", self.onVolumeDown, "Ctrl+Down")
         self.controls_menu.addSeparator()
-
-        # The "About" item is fine here, since we assume Mac and that will place the item into
-        # different submenu but this will need to be fixed for linux and windows
-        self.controls_menu.addSeparator()
-        self._about_box_action = self.controls_menu.addAction("About", self.onAbout)
 
         self.window_menu = self.menubar.addMenu("Window")
         self._minimize = self.window_menu.addAction("Minimize", self.onMinimize, "Ctrl+M")
@@ -83,6 +86,9 @@ class MainWindow(QtWidgets.QMainWindow):
         active_window = qapp.activeWindow()
         if active_window == self:
             self._show_main_window.setChecked(True)
+
+    def onNewStation(self):
+        pass
 
     def onPlayPause(self):
         pass
