@@ -49,6 +49,7 @@ def run():
     check_requirements()
 
     # pylint: disable=import-outside-toplevel
+    import yaml
     import spotipy
     import spotipy.util
     from PyQt5 import QtWidgets, QtGui, QtCore
@@ -61,7 +62,23 @@ def run():
     qapp = QtWidgets.QApplication(sys.argv)
     qapp.setQuitOnLastWindowClosed(False)
 
+    # ---
+    with open('config.yml', 'rt') as f:
+        config = yaml.safe_load(f)
+
+    token = spotipy.util.prompt_for_user_token(
+            username = config['username'],
+            scope = 'user-read-playback-state user-modify-playback-state user-read-currently-playing playlist-modify-private',
+            client_id = config['client-id'],
+            client_secret = config['client-secret'],
+            redirect_uri = config['redirect-uri'])
+
+    spotify = spotipy.Spotify(auth = token)
+    spotify.trace = False
+    # ---
+
     window = MainWindow()
+    window.setupSpotify(spotify)
     window.show()
 
     sys.exit(qapp.exec_())

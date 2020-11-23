@@ -16,8 +16,12 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def __init__(self):
         super().__init__()
+        # spotify object
+        self._spotify = None
+        # my spotify profile
+        self._me = None
         self._settings = QtCore.QSettings()
-        self.about_dlg = None
+        self._about_dlg = None
 
         self.readSettings()
         self.setupWidgets()
@@ -102,9 +106,9 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         Called when FileAbout action is triggered
         """
-        if self.about_dlg is None:
-            self.about_dlg = AboutDialog(self)
-        self.about_dlg.show()
+        if self._about_dlg is None:
+            self._about_dlg = AboutDialog(self)
+        self._about_dlg.show()
 
     def onMinimize(self):
         """
@@ -150,6 +154,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self._settings.setValue("geometry", self.saveGeometry())
         self._settings.endGroup()
 
+        self._settings.beginGroup("spotify")
+        self._settings.setValue("playlist_id", self._playlist_id)
+        self._settings.endGroup()
+
     def readSettings(self):
         """
         Read settings
@@ -164,3 +172,21 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             self.restoreGeometry(geom)
         self._settings.endGroup()
+
+    def setupSpotify(self, spotify):
+        self._spotify = spotify
+        if spotify is None:
+            return
+
+        self._me = self._spotify.me()
+
+        self._settings.beginGroup("spotify")
+        self._playlist_id = self._settings.value("playlist_id")
+        self._settings.endGroup()
+
+        # Create our playlist if there is not one
+        if self._playlist_id is None:
+            pl = self._spotify.user_playlist_create(self._me['id'], "Classical Radio", public=False, description="Created by Spotify Classical Qt Application")
+            self._playlist_id = pl['id']
+
+        # TODO: check that playlist_id is valid
