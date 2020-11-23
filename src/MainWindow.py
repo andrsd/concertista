@@ -5,6 +5,7 @@ MainWindow.py
 import os
 import io
 import yaml
+import random
 from PyQt5 import QtWidgets, QtCore
 import consts
 from AboutDialog import AboutDialog
@@ -16,10 +17,16 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def __init__(self):
         super().__init__()
-        # spotify object
+        # database
+        self._db = None
+        # Spotify object
         self._spotify = None
-        # my spotify profile
+        # my Spotify profile
         self._me = None
+        # Spotify devices
+        self._devices = None
+        # active Spotify device Id
+        self._active_device_id = None
         self._settings = QtCore.QSettings()
         self._about_dlg = None
 
@@ -34,7 +41,32 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         w = QtWidgets.QWidget(self)
         w.setContentsMargins(0, 0, 0 ,0)
-        layout = QtWidgets.QHBoxLayout()
+        layout = QtWidgets.QVBoxLayout()
+
+        self.top_pane = QtWidgets.QWidget(self)
+        self.top_pane.setFixedHeight(200)
+
+        top_layout = QtWidgets.QVBoxLayout()
+
+        self.title = QtWidgets.QLabel("")
+        font = self.title.font()
+        font.setBold(True)
+        self.title.setFont(font)
+        self.title.setAlignment(QtCore.Qt.AlignLeft)
+        top_layout.addWidget(self.title)
+
+        self.artists = QtWidgets.QLabel("")
+        font = self.artists.font()
+        font.setPointSize(int(0.95 * font.pointSize()))
+        self.artists.setFont(font)
+        self.artists.setAlignment(QtCore.Qt.AlignLeft)
+        top_layout.addWidget(self.artists)
+
+        top_layout.addStretch()
+
+        self.top_pane.setLayout(top_layout)
+
+        layout.addWidget(self.top_pane)
 
         w.setLayout(layout)
         self.setCentralWidget(w)
@@ -55,7 +87,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.controls_menu = self.menubar.addMenu("Controls")
         self._play_pause = self.controls_menu.addAction("Play", self.onPlayPause, "Space")
-        self._stop = self.controls_menu.addAction("Stop", self.onStop, "Ctrl+.")
         self._next = self.controls_menu.addAction("Next", self.onNext, "Ctrl+Right")
         self._previous = self.controls_menu.addAction("Previous", self.onPrevious, "Ctrl+Left")
         self.controls_menu.addSeparator()
@@ -88,25 +119,64 @@ class MainWindow(QtWidgets.QMainWindow):
             self._show_main_window.setChecked(True)
 
     def onNewStation(self):
-        pass
+        """
+        Start to listen to new music
+        """
+        pieces = self._db.get_pieces()
+        rng = random.sample(list(pieces.keys()), k = 3)
+
+        # add the tracks
+        max_tracks = 200
+        uris = []
+        for id in rng:
+            piece = pieces[id]
+            for track in piece['tracks']:
+                uri = "spotify:track:{}".format(track)
+                uris.append(uri)
+                max_tracks = max_tracks - 1
+                if max_tracks == 0:
+                    break
+            if max_tracks == 0:
+                break
+        self._spotify.start_playback(device_id=self._active_device_id, uris=uris)
 
     def onPlayPause(self):
-        pass
-
-    def onStop(self):
-        pass
+        """
+        Start/Pause the playback
+        """
+        cpb = self._spotify.current_playback()
+        if cpb['is_playing'] == True:
+            self._spotify.pause_playback(device_id=self._active_device_id)
+            self._play_pause.setText("Play")
+        else:
+            self._spotify.start_playback(device_id=self._active_device_id)
+            self._play_pause.setText("Pause")
 
     def onNext(self):
-        pass
+        """
+        Skip to the next track
+        """
+        self._spotify.next_track(device_id=self._active_device_id)
 
     def onPrevious(self):
-        pass
+        """
+        Jump to the previous track
+        """
+        self._spotify.previous_track(device_id=self._active_device_id)
 
     def onVolumeUp(self):
-        pass
+        """
+        Increase volume
+        """
+        self._volume = min(self._volume + 5, 100)
+        self._spotify.volume(self._volume, device_id=self._active_device_id)
 
     def onVolumeDown(self):
-        pass
+        """
+        Decrease volume
+        """
+        self._volume = max(self._volume - 5, 0)
+        self._spotify.volume(self._volume, device_id=self._active_device_id)
 
     def onAbout(self):
         """
@@ -160,10 +230,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self._settings.setValue("geometry", self.saveGeometry())
         self._settings.endGroup()
 
-        self._settings.beginGroup("spotify")
-        self._settings.setValue("playlist_id", self._playlist_id)
-        self._settings.endGroup()
-
     def readSettings(self):
         """
         Read settings
@@ -186,13 +252,34 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self._me = self._spotify.me()
 
-        self._settings.beginGroup("spotify")
-        self._playlist_id = self._settings.value("playlist_id")
-        self._settings.endGroup()
+        # get active playback device and save its state
+        devs = self._spotify.devices()
+        self._devices = []
+        for d in devs['devices']:
+            self._devices.append(d)
+            if d['is_active'] == True:
+                self._active_device_id = d['id']
+                self._volume = d['volume_percent']
 
-        # Create our playlist if there is not one
-        if self._playlist_id is None:
-            pl = self._spotify.user_playlist_create(self._me['id'], "Classical Radio", public=False, description="Created by Spotify Classical Qt Application")
-            self._playlist_id = pl['id']
+        cpb = self._spotify.current_playback()
+        if cpb is not None:
+            if cpb['is_playing'] == True:
+                self._play_pause.setText("Pause")
+            else:
+                self._play_pause.setText("Play")
 
-        # TODO: check that playlist_id is valid
+            # set current playing track
+            self.title.setText(cpb['item']['name'])
+            artists = []
+            for a in cpb['item']['artists']:
+                artists.append(a['name'])
+            self.artists.setText(", ".join(artists))
+
+        # fill in upcoming track
+        # queue = self._spotify.current_playback()
+
+    def setupDB(self, db):
+        """
+        Setup the database object
+        """
+        self._db = db

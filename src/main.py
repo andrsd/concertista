@@ -54,6 +54,7 @@ def run():
     import spotipy.util
     from PyQt5 import QtWidgets, QtGui, QtCore
     from MainWindow import MainWindow
+    from DB import DB
 
     QtCore.QCoreApplication.setOrganizationName("David Andrs")
     QtCore.QCoreApplication.setOrganizationDomain("name.andrs")
@@ -77,7 +78,12 @@ def run():
     spotify.trace = False
     # ---
 
+    # read the db
+    db = DB("spotify")
+    db.load()
+
     window = MainWindow()
+    window.setupDB(db)
     window.setupSpotify(spotify)
     window.show()
 
