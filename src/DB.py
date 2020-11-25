@@ -34,14 +34,18 @@ class DB:
         for root, dirs, files in os.walk(self._dir + "/tracks"):
             path = root.split(os.sep)
             for file in files:
-                with open(root + '/' + file, 'rt') as f:
-                    piece = yaml.safe_load(f)
+                if file.endswith(('.yml')):
+                    try:
+                        with open(root + '/' + file, 'rt') as f:
+                            piece = yaml.safe_load(f)
 
-                id = uuid.uuid4()
-                peice_id = id.hex;
-                self._pieces[peice_id] = piece
+                        id = uuid.uuid4()
+                        peice_id = id.hex;
+                        self._pieces[peice_id] = piece
 
-                composer_id = piece['composer_id']
-                if composer_id not in self._pieces_by_composers:
-                    self._pieces_by_composers[composer_id] = []
-                self._pieces_by_composers[composer_id].append(piece)
+                        composer_id = piece['composer_id']
+                        if composer_id not in self._pieces_by_composers:
+                            self._pieces_by_composers[composer_id] = []
+                        self._pieces_by_composers[composer_id].append(piece)
+                    except:
+                        print("Error loading file:", file)
