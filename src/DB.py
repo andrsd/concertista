@@ -14,6 +14,7 @@ class DB:
         self._dir = dir
         self._composers = []
         self._pieces = {}
+        # composer_id -> dict(piece ids)
         self._pieces_by_composers = {}
 
     def load(self):
@@ -25,6 +26,12 @@ class DB:
 
     def get_pieces(self):
         return self._pieces
+
+    def get_composers(self):
+        return self._composers
+
+    def get_composer_pieces(self, composer_id):
+        return self._pieces_by_composers[composer_id]
 
     def _load_composers(self):
         with open(self._dir + '/composers.yml', 'rt') as f:
@@ -40,12 +47,12 @@ class DB:
                             piece = yaml.safe_load(f)
 
                         id = uuid.uuid4()
-                        peice_id = id.hex;
-                        self._pieces[peice_id] = piece
+                        piece_id = id.hex;
+                        self._pieces[piece_id] = piece
 
                         composer_id = piece['composer_id']
                         if composer_id not in self._pieces_by_composers:
                             self._pieces_by_composers[composer_id] = []
-                        self._pieces_by_composers[composer_id].append(piece)
+                        self._pieces_by_composers[composer_id].append(piece_id)
                     except:
                         print("Error loading file:", file)

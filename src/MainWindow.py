@@ -9,6 +9,7 @@ import random
 from PyQt5 import QtWidgets, QtCore
 import consts
 from AboutDialog import AboutDialog
+from StationByComposerDialog import StationByComposerDialog
 from DeveloperWindow import DeveloperWindow
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -33,6 +34,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self._settings = QtCore.QSettings()
         self._about_dlg = None
         self._developer_window = None
+
+        self._station_by_composer_dlg = StationByComposerDialog(self)
+        self._station_by_composer_dlg.finished.connect(self.onNewStationByComposerPlay)
 
         self.readSettings()
         self.setupWidgets()
@@ -83,6 +87,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.station_menu = self.menubar.addMenu("Station")
         self._new_station = self.station_menu.addAction("New", self.onNewStation, "Ctrl+N")
+        self._new_station_by_composer = self.station_menu.addAction("By composer", self.onNewStationByComposer)
         self.station_menu.addSeparator()
         self._developer = self.station_menu.addAction("Developer", self.onDeveloper, "Ctrl+Alt+I")
 
@@ -124,12 +129,12 @@ class MainWindow(QtWidgets.QMainWindow):
         if active_window == self:
             self._show_main_window.setChecked(True)
 
-    def onNewStation(self):
+    def randomizePiecesAndPlay(self, piece_ids):
         """
-        Start to listen to new music
+        Randomize list of pieces and start playing
         """
+        rng = random.sample(piece_ids, k = 3)
         pieces = self._db.get_pieces()
-        rng = random.sample(list(pieces.keys()), k = 3)
 
         # add the tracks
         max_tracks = 200
@@ -145,6 +150,27 @@ class MainWindow(QtWidgets.QMainWindow):
             if max_tracks == 0:
                 break
         self._spotify.start_playback(device_id=self._active_device_id, uris=uris)
+
+    def onNewStation(self):
+        """
+        Start to listen to new music
+        """
+        pieces = self._db.get_pieces()
+        self.randomizePiecesAndPlay(list(pieces.keys()))
+
+    def onNewStationByComposer(self):
+        """
+        Open the new station using composer name dialog
+        """
+        self._station_by_composer_dlg.open()
+
+    def onNewStationByComposerPlay(self):
+        """
+        Start playing pieces from a composer
+        """
+        composer_id = self._station_by_composer_dlg._artist["id"]
+        pieces_ids = self._db.get_composer_pieces(composer_id)
+        self.randomizePiecesAndPlay(pieces_ids)
 
     def onDeveloper(self):
         """
@@ -298,3 +324,4 @@ class MainWindow(QtWidgets.QMainWindow):
         Setup the database object
         """
         self._db = db
+        self._station_by_composer_dlg.setupDB(db)
