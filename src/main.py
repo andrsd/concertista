@@ -64,7 +64,7 @@ def run():
     qapp.setQuitOnLastWindowClosed(False)
 
     # ---
-    with open('config.yml', 'rt') as f:
+    with open('.config.yml', 'rt') as f:
         config = yaml.safe_load(f)
 
     token = spotipy.util.prompt_for_user_token(

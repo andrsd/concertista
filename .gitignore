@@ -1,5 +1,6 @@
 *.pyc
 .cache-*
+.config.yml
 
 # py2app
 .eggs/*
