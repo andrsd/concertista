@@ -76,8 +76,13 @@ class MainWindow(QtWidgets.QMainWindow):
 
         layout.addWidget(self.top_pane)
 
+        self.device_combo_box = QtWidgets.QComboBox()
+        layout.addWidget(self.device_combo_box)
+
         w.setLayout(layout)
         self.setCentralWidget(w)
+
+        self.device_combo_box.currentIndexChanged.connect(self.onCurrentDeviceChanged)
 
     def setupMenuBar(self):
         """
@@ -227,6 +232,13 @@ class MainWindow(QtWidgets.QMainWindow):
             self._about_dlg = AboutDialog(self)
         self._about_dlg.show()
 
+    def onCurrentDeviceChanged(self, index):
+        """
+        When current device changes
+        """
+        self._active_device_id = self.device_combo_box.itemData(index)
+        self._spotify.transfer_playback(self._active_device_id)
+
     def onMinimize(self):
         """
         Called when WindowMinimize is triggered
@@ -270,6 +282,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self._settings.beginGroup("MainWindow")
         self._settings.setValue("geometry", self.saveGeometry())
         self._settings.endGroup()
+
+        self._settings.setValue("device", self.device_combo_box.currentData())
 
     def readSettings(self):
         """
@@ -318,6 +332,23 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # fill in upcoming track
         # queue = self._spotify.current_playback()
+
+        # devices
+        self.device_combo_box.blockSignals(True)
+        for dev in self._devices:
+            self.device_combo_box.addItem(dev['name'], dev['id'])
+        self.device_combo_box.blockSignals(False)
+
+        if self._active_device_id is None:
+            active_device = self._settings.value("device")
+            if active_device is not None:
+                index = self.device_combo_box.findData(active_device)
+                if index != -1:
+                    self.device_combo_box.setCurrentIndex(index)
+        else:
+            index = self.device_combo_box.findData(self._active_device_id)
+            if index != -1:
+                self.device_combo_box.setCurrentIndex(index)
 
     def setupDB(self, db):
         """
