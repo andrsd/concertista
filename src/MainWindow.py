@@ -6,7 +6,7 @@ import os
 import io
 import yaml
 import random
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore, QtNetwork, QtGui
 import consts
 from AboutDialog import AboutDialog
 from StationByComposerDialog import StationByComposerDialog
@@ -16,6 +16,9 @@ class MainWindow(QtWidgets.QMainWindow):
     """
     Main window
     """
+
+    ALBUM_IMAGE_WD = 128
+    ALBUM_IMAGE_HT = 128
 
     VOLUME_PAGE_STEP = 5
     VOLUME_MINIMUM = 0
@@ -42,6 +45,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self._station_by_composer_dlg = StationByComposerDialog(self)
         self._station_by_composer_dlg.finished.connect(self.onNewStationByComposerPlay)
 
+        self._nam = QtNetwork.QNetworkAccessManager()
+        self._nam.finished.connect(self.onNetworkReply)
+
         self.readSettings()
         self.setupWidgets()
         self.setupMenuBar()
@@ -53,7 +59,18 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         w = QtWidgets.QWidget(self)
         w.setContentsMargins(0, 0, 0 ,0)
-        w.setFixedHeight(120)
+
+        h_layout = QtWidgets.QHBoxLayout()
+
+        left_layout = QtWidgets.QVBoxLayout()
+
+        self._image = QtWidgets.QLabel()
+        self._image.setFixedSize(self.ALBUM_IMAGE_WD, self.ALBUM_IMAGE_HT)
+
+        left_layout.addWidget(self._image)
+        left_layout.setAlignment(QtCore.Qt.AlignTop)
+
+        h_layout.addLayout(left_layout)
 
         layout = QtWidgets.QVBoxLayout()
 
@@ -97,7 +114,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         layout.addWidget(self._top_pane)
 
-        w.setLayout(layout)
+        h_layout.addLayout(layout)
+
+        w.setLayout(h_layout)
         self.setCentralWidget(w)
 
         self._device_combo_box.currentIndexChanged.connect(self.onCurrentDeviceChanged)
@@ -355,6 +374,14 @@ class MainWindow(QtWidgets.QMainWindow):
                 artists.append(a['name'])
             self._artists.setText(", ".join(artists))
 
+        images = cpb['item']['album']['images']
+        for img in images:
+            if (img['height'] >= self.ALBUM_IMAGE_HT) and (img['height'] <= 600):
+                img_url = img['url']
+
+        img_req = QtNetwork.QNetworkRequest(QtCore.QUrl(img_url))
+        self._nam.get(img_req)
+
         # fill in upcoming track
         # queue = self._spotify.current_playback()
 
@@ -389,3 +416,15 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         self._db = db
         self._station_by_composer_dlg.setupDB(db)
+
+    def onNetworkReply(self, reply):
+        """
+        Called when network request was finished
+        """
+        img = QtGui.QImage()
+        img.load(reply, "")
+        # img.scaled(self.ALBUM_IMAGE_WD, self.ALBUM_IMAGE_HT, QtCore.Qt.KeepAspectRatio)
+        # img.scaled(self.ALBUM_IMAGE_WD, self.ALBUM_IMAGE_HT)
+        scaled_img = img.scaledToWidth(self.ALBUM_IMAGE_WD)
+        pixmap = QtGui.QPixmap.fromImage(scaled_img)
+        self._image.setPixmap(pixmap)
