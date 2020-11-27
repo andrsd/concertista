@@ -17,6 +17,10 @@ class MainWindow(QtWidgets.QMainWindow):
     Main window
     """
 
+    VOLUME_PAGE_STEP = 5
+    VOLUME_MINIMUM = 0
+    VOLUME_MAXIMUM = 100
+
     def __init__(self):
         super().__init__()
         # database
@@ -49,12 +53,14 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         w = QtWidgets.QWidget(self)
         w.setContentsMargins(0, 0, 0 ,0)
+        w.setFixedHeight(120)
+
         layout = QtWidgets.QVBoxLayout()
 
         self._top_pane = QtWidgets.QWidget(self)
-        self._top_pane.setFixedHeight(200)
 
         top_layout = QtWidgets.QVBoxLayout()
+        top_layout.setContentsMargins(0, 0, 0 ,0)
 
         self._title = QtWidgets.QLabel("")
         font = self._title.font()
@@ -72,17 +78,30 @@ class MainWindow(QtWidgets.QMainWindow):
 
         top_layout.addStretch()
 
+        bottom_h_layout = QtWidgets.QHBoxLayout()
+        self._volume_slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
+        self._volume_slider.setTickPosition(QtWidgets.QSlider.NoTicks)
+        self._volume_slider.setTracking(True)
+        self._volume_slider.setMinimum(self.VOLUME_MINIMUM)
+        self._volume_slider.setMaximum(self.VOLUME_MAXIMUM)
+        self._volume_slider.setPageStep(self.VOLUME_PAGE_STEP)
+        bottom_h_layout.addWidget(self._volume_slider)
+
+        self._device_combo_box = QtWidgets.QComboBox()
+        bottom_h_layout.addWidget(self._device_combo_box)
+        bottom_h_layout.setContentsMargins(0, 0, 0 ,0)
+
+        top_layout.addLayout(bottom_h_layout)
+
         self._top_pane.setLayout(top_layout)
 
         layout.addWidget(self._top_pane)
-
-        self._device_combo_box = QtWidgets.QComboBox()
-        layout.addWidget(self._device_combo_box)
 
         w.setLayout(layout)
         self.setCentralWidget(w)
 
         self._device_combo_box.currentIndexChanged.connect(self.onCurrentDeviceChanged)
+        self._volume_slider.valueChanged.connect(self.onVolumeChanged)
 
     def setupMenuBar(self):
         """
@@ -214,14 +233,18 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         Increase volume
         """
-        self._volume = min(self._volume + 5, 100)
-        self._spotify.volume(self._volume, device_id=self._active_device_id)
+        volume = min(self._volume + self.VOLUME_PAGE_STEP, self.VOLUME_MAXIMUM)
+        self._volume_slider.setValue(volume)
 
     def onVolumeDown(self):
         """
         Decrease volume
         """
-        self._volume = max(self._volume - 5, 0)
+        volume = max(self._volume - self.VOLUME_PAGE_STEP, self.VOLUME_MINIMUM)
+        self._volume_slider.setValue(volume)
+
+    def onVolumeChanged(self, value):
+        self._volume = value
         self._spotify.volume(self._volume, device_id=self._active_device_id)
 
     def onAbout(self):
@@ -351,6 +374,14 @@ class MainWindow(QtWidgets.QMainWindow):
             index = self._device_combo_box.findData(self._active_device_id)
             if index != -1:
                 self._device_combo_box.setCurrentIndex(index)
+
+        # volume
+        if self._volume is None:
+            pass
+        else:
+            self._volume_slider.blockSignals(True)
+            self._volume_slider.setValue(self._volume)
+            self._volume_slider.blockSignals(False)
 
     def setupDB(self, db):
         """
