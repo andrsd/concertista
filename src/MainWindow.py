@@ -51,79 +51,79 @@ class MainWindow(QtWidgets.QMainWindow):
         w.setContentsMargins(0, 0, 0 ,0)
         layout = QtWidgets.QVBoxLayout()
 
-        self.top_pane = QtWidgets.QWidget(self)
-        self.top_pane.setFixedHeight(200)
+        self._top_pane = QtWidgets.QWidget(self)
+        self._top_pane.setFixedHeight(200)
 
         top_layout = QtWidgets.QVBoxLayout()
 
-        self.title = QtWidgets.QLabel("")
-        font = self.title.font()
+        self._title = QtWidgets.QLabel("")
+        font = self._title.font()
         font.setBold(True)
-        self.title.setFont(font)
-        self.title.setAlignment(QtCore.Qt.AlignLeft)
-        top_layout.addWidget(self.title)
+        self._title.setFont(font)
+        self._title.setAlignment(QtCore.Qt.AlignLeft)
+        top_layout.addWidget(self._title)
 
-        self.artists = QtWidgets.QLabel("")
-        font = self.artists.font()
+        self._artists = QtWidgets.QLabel("")
+        font = self._artists.font()
         font.setPointSize(int(0.95 * font.pointSize()))
-        self.artists.setFont(font)
-        self.artists.setAlignment(QtCore.Qt.AlignLeft)
-        top_layout.addWidget(self.artists)
+        self._artists.setFont(font)
+        self._artists.setAlignment(QtCore.Qt.AlignLeft)
+        top_layout.addWidget(self._artists)
 
         top_layout.addStretch()
 
-        self.top_pane.setLayout(top_layout)
+        self._top_pane.setLayout(top_layout)
 
-        layout.addWidget(self.top_pane)
+        layout.addWidget(self._top_pane)
 
-        self.device_combo_box = QtWidgets.QComboBox()
-        layout.addWidget(self.device_combo_box)
+        self._device_combo_box = QtWidgets.QComboBox()
+        layout.addWidget(self._device_combo_box)
 
         w.setLayout(layout)
         self.setCentralWidget(w)
 
-        self.device_combo_box.currentIndexChanged.connect(self.onCurrentDeviceChanged)
+        self._device_combo_box.currentIndexChanged.connect(self.onCurrentDeviceChanged)
 
     def setupMenuBar(self):
         """
         Setup menu bar
         """
-        self.menubar = QtWidgets.QMenuBar(self)
+        self._menubar = QtWidgets.QMenuBar(self)
 
-        self.station_menu = self.menubar.addMenu("Station")
-        self._new_station = self.station_menu.addAction("New", self.onNewStation, "Ctrl+N")
-        self._new_station_by_composer = self.station_menu.addAction("By composer", self.onNewStationByComposer)
-        self.station_menu.addSeparator()
-        self._developer = self.station_menu.addAction("Developer", self.onDeveloper, "Ctrl+Alt+I")
+        self._station_menu = self._menubar.addMenu("Station")
+        self._new_station = self._station_menu.addAction("New", self.onNewStation, "Ctrl+N")
+        self._new_station_by_composer = self._station_menu.addAction("By composer", self.onNewStationByComposer)
+        self._station_menu.addSeparator()
+        self._developer = self._station_menu.addAction("Developer", self.onDeveloper, "Ctrl+Alt+I")
 
         # The "About" item is fine here, since we assume Mac and that will place the item into
         # different submenu but this will need to be fixed for linux and windows
-        self.station_menu.addSeparator()
-        self._about_box_action = self.station_menu.addAction("About", self.onAbout)
+        self._station_menu.addSeparator()
+        self._about_box_action = self._station_menu.addAction("About", self.onAbout)
 
-        self.controls_menu = self.menubar.addMenu("Controls")
-        self._play_pause = self.controls_menu.addAction("Play", self.onPlayPause, "Space")
-        self._next = self.controls_menu.addAction("Next", self.onNext, "Ctrl+Right")
-        self._previous = self.controls_menu.addAction("Previous", self.onPrevious, "Ctrl+Left")
-        self.controls_menu.addSeparator()
-        self._volume_up = self.controls_menu.addAction("Increase Volume", self.onVolumeUp, "Ctrl+Up")
-        self._volume_down = self.controls_menu.addAction("Decrease Volume", self.onVolumeDown, "Ctrl+Down")
-        self.controls_menu.addSeparator()
+        self._controls_menu = self._menubar.addMenu("Controls")
+        self._play_pause = self._controls_menu.addAction("Play", self.onPlayPause, "Space")
+        self._next = self._controls_menu.addAction("Next", self.onNext, "Ctrl+Right")
+        self._previous = self._controls_menu.addAction("Previous", self.onPrevious, "Ctrl+Left")
+        self._controls_menu.addSeparator()
+        self._volume_up = self._controls_menu.addAction("Increase Volume", self.onVolumeUp, "Ctrl+Up")
+        self._volume_down = self._controls_menu.addAction("Decrease Volume", self.onVolumeDown, "Ctrl+Down")
+        self._controls_menu.addSeparator()
 
-        self.window_menu = self.menubar.addMenu("Window")
-        self._minimize = self.window_menu.addAction("Minimize", self.onMinimize, "Ctrl+M")
-        self.window_menu.addSeparator()
-        self._bring_all_to_front = self.window_menu.addAction("Bring All to Front",
+        self._window_menu = self._menubar.addMenu("Window")
+        self._minimize = self._window_menu.addAction("Minimize", self.onMinimize, "Ctrl+M")
+        self._window_menu.addSeparator()
+        self._bring_all_to_front = self._window_menu.addAction("Bring All to Front",
             self.onBringAllToFront)
 
-        self.window_menu.addSeparator()
-        self._show_main_window = self.window_menu.addAction("Spotify Classical Radio", self.onShowMainWindow)
+        self._window_menu.addSeparator()
+        self._show_main_window = self._window_menu.addAction("Spotify Classical Radio", self.onShowMainWindow)
         self._show_main_window.setCheckable(True)
 
-        self.action_group_windows = QtWidgets.QActionGroup(self)
-        self.action_group_windows.addAction(self._show_main_window)
+        self._action_group_windows = QtWidgets.QActionGroup(self)
+        self._action_group_windows.addAction(self._show_main_window)
 
-        self.setMenuBar(self.menubar)
+        self.setMenuBar(self._menubar)
 
     def updateMenuBar(self):
         """
@@ -236,8 +236,10 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         When current device changes
         """
-        self._active_device_id = self.device_combo_box.itemData(index)
-        self._spotify.transfer_playback(self._active_device_id)
+        new_device_id = self._device_combo_box.itemData(index)
+        if new_device_id != self._active_device_id:
+            self._active_device_id = self._device_combo_box.itemData(index)
+            self._spotify.transfer_playback(self._active_device_id)
 
     def onMinimize(self):
         """
@@ -283,7 +285,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._settings.setValue("geometry", self.saveGeometry())
         self._settings.endGroup()
 
-        self._settings.setValue("device", self.device_combo_box.currentData())
+        self._settings.setValue("device", self._device_combo_box.currentData())
 
     def readSettings(self):
         """
@@ -324,31 +326,31 @@ class MainWindow(QtWidgets.QMainWindow):
                 self._play_pause.setText("Play")
 
             # set current playing track
-            self.title.setText(cpb['item']['name'])
+            self._title.setText(cpb['item']['name'])
             artists = []
             for a in cpb['item']['artists']:
                 artists.append(a['name'])
-            self.artists.setText(", ".join(artists))
+            self._artists.setText(", ".join(artists))
 
         # fill in upcoming track
         # queue = self._spotify.current_playback()
 
         # devices
-        self.device_combo_box.blockSignals(True)
+        self._device_combo_box.blockSignals(True)
         for dev in self._devices:
-            self.device_combo_box.addItem(dev['name'], dev['id'])
-        self.device_combo_box.blockSignals(False)
+            self._device_combo_box.addItem(dev['name'], dev['id'])
+        self._device_combo_box.blockSignals(False)
 
         if self._active_device_id is None:
             active_device = self._settings.value("device")
             if active_device is not None:
-                index = self.device_combo_box.findData(active_device)
+                index = self._device_combo_box.findData(active_device)
                 if index != -1:
-                    self.device_combo_box.setCurrentIndex(index)
+                    self._device_combo_box.setCurrentIndex(index)
         else:
-            index = self.device_combo_box.findData(self._active_device_id)
+            index = self._device_combo_box.findData(self._active_device_id)
             if index != -1:
-                self.device_combo_box.setCurrentIndex(index)
+                self._device_combo_box.setCurrentIndex(index)
 
     def setupDB(self, db):
         """

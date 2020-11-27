@@ -14,33 +14,33 @@ class AboutDialog(QtWidgets.QDialog):
         self.setWindowFlag(QtCore.Qt.CustomizeWindowHint, True)
         self.setWindowFlag(QtCore.Qt.WindowMaximizeButtonHint, False)
 
-        self.layout = QtWidgets.QVBoxLayout()
-        self.layout.addSpacing(8)
+        self._layout = QtWidgets.QVBoxLayout()
+        self._layout.addSpacing(8)
 
         icon = QtWidgets.QApplication.windowIcon()
-        self.icon = QtWidgets.QLabel()
-        self.icon.setPixmap(icon.pixmap(64, 64))
-        self.layout.addWidget(self.icon, 0, QtCore.Qt.AlignHCenter)
+        self._icon = QtWidgets.QLabel()
+        self._icon.setPixmap(icon.pixmap(64, 64))
+        self._layout.addWidget(self._icon, 0, QtCore.Qt.AlignHCenter)
 
-        self.title = QtWidgets.QLabel("Spotify Classical Radio")
-        font = self.title.font()
+        self._title = QtWidgets.QLabel("Spotify Classical Radio")
+        font = self._title.font()
         font.setBold(True)
         font.setPointSize(int(1.2 * font.pointSize()))
-        self.title.setFont(font)
-        self.title.setAlignment(QtCore.Qt.AlignHCenter)
-        self.layout.addWidget(self.title)
+        self._title.setFont(font)
+        self._title.setAlignment(QtCore.Qt.AlignHCenter)
+        self._layout.addWidget(self._title)
 
-        self.text = QtWidgets.QLabel(
+        self._text = QtWidgets.QLabel(
             "Version {}\n"
             "\n"
             "Powered by spotify\n"
             "\n"
             "{}".format(consts.VERSION, consts.COPYRIGHT)
         )
-        font = self.text.font()
+        font = self._text.font()
         font.setPointSize(int(0.9 * font.pointSize()))
-        self.text.setFont(font)
-        self.text.setAlignment(QtCore.Qt.AlignHCenter)
-        self.layout.addWidget(self.text)
+        self._text.setFont(font)
+        self._text.setAlignment(QtCore.Qt.AlignHCenter)
+        self._layout.addWidget(self._text)
 
-        self.setLayout(self.layout)
+        self.setLayout(self._layout)

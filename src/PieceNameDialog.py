@@ -13,7 +13,7 @@ class PieceNameDialog(QtWidgets.QDialog):
 
     def __init__(self, parent):
         super().__init__(parent)
-        self.parent = parent
+        self._parent = parent
 
         self._artist = None
         self._album = None
