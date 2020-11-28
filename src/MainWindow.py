@@ -344,9 +344,9 @@ class MainWindow(QtWidgets.QMainWindow):
         geom = self._settings.value("geometry")
         if geom is None:
             screen_rc = QtWidgets.QApplication.desktop().screenGeometry()
-            wnd_wd = 450
-            wnd_ht = int(0.9 * screen_rc.height())
-            self.setGeometry(QtCore.QRect(screen_rc.width() - wnd_wd - 10, (screen_rc.height() - wnd_ht) / 2, wnd_wd, wnd_ht))
+            wnd_wd = 600
+            wnd_ht = 152
+            self.setGeometry(QtCore.QRect(screen_rc.width() - wnd_wd - 10, 10, wnd_wd, wnd_ht))
         else:
             self.restoreGeometry(geom)
         self._settings.endGroup()
