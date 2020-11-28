@@ -53,6 +53,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._nam.finished.connect(self.onNetworkReply)
 
         self.readSettings()
+        self.setWindowTitle("Player")
         self.setupWidgets()
         self.setupMenuBar()
         self.updateMenuBar()
@@ -162,7 +163,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.onBringAllToFront)
 
         self._window_menu.addSeparator()
-        self._show_main_window = self._window_menu.addAction("Spotify Classical Radio", self.onShowMainWindow)
+        self._show_main_window = self._window_menu.addAction("Player", self.onShowMainWindow)
         self._show_main_window.setCheckable(True)
 
         self._action_group_windows = QtWidgets.QActionGroup(self)
