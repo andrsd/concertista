@@ -40,6 +40,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self._devices = None
         # active Spotify device Id
         self._active_device_id = None
+        self._current_title = ""
+        self._current_artists = []
         self._settings = QtCore.QSettings()
         self._about_dlg = None
         self._developer_window = None
@@ -89,6 +91,7 @@ class MainWindow(QtWidgets.QMainWindow):
         font.setBold(True)
         self._title.setFont(font)
         self._title.setAlignment(QtCore.Qt.AlignLeft)
+        self._title.setMinimumWidth(440)
         top_layout.addWidget(self._title)
 
         self._artists = QtWidgets.QLabel("")
@@ -96,6 +99,7 @@ class MainWindow(QtWidgets.QMainWindow):
         font.setPointSize(int(0.95 * font.pointSize()))
         self._artists.setFont(font)
         self._artists.setAlignment(QtCore.Qt.AlignLeft)
+        self._artists.setMinimumWidth(440)
         top_layout.addWidget(self._artists)
 
         top_layout.addStretch()
@@ -161,6 +165,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         w.setLayout(h_layout)
         self.setCentralWidget(w)
+        self.setMaximumHeight(152)
 
         self._device_combo_box.setEnabled(False)
         self._volume_slider.setEnabled(False)
@@ -366,6 +371,9 @@ class MainWindow(QtWidgets.QMainWindow):
             self.updateMenuBar()
         return super().event(event)
 
+    def resizeEvent(self, event):
+        self.updateCurrentlyPlayingTitle()
+
     def closeEvent(self, event):
         """
         Called when EventClose is recieved
@@ -452,6 +460,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self._device_combo_box.setEnabled(True)
         self._volume_slider.setEnabled(True)
 
+    def updateCurrentlyPlayingTitle(self):
+        title = self._current_title
+        metrics = QtGui.QFontMetrics(self._title.font())
+        text = metrics.elidedText(title, QtCore.Qt.ElideRight, self._title.width())
+        self._title.setText(text)
+
+        artists = ", ".join(self._current_artists)
+        metrics = QtGui.QFontMetrics(self._artists.font())
+        text = metrics.elidedText(artists, QtCore.Qt.ElideRight, self._artists.width())
+        self._artists.setText(text)
+
     def updateCurrentlyPlaying(self):
         cpb = self._spotify.current_playback()
         if cpb is not None:
@@ -462,12 +481,11 @@ class MainWindow(QtWidgets.QMainWindow):
                 self._play_pause.setText("Play")
                 self._play_pause_button.setIcon(self._play_icon)
 
-            # set current playing track
-            self._title.setText(cpb['item']['name'])
-            artists = []
+            self._current_title = cpb['item']['name']
+            self._current_artists = []
             for a in cpb['item']['artists']:
-                artists.append(a['name'])
-            self._artists.setText(", ".join(artists))
+                self._current_artists.append(a['name'])
+            self.updateCurrentlyPlayingTitle()
 
             images = cpb['item']['album']['images']
             for img in images:
