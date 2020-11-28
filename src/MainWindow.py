@@ -63,7 +63,7 @@ class MainWindow(QtWidgets.QMainWindow):
         Setup widgets
         """
         w = QtWidgets.QWidget(self)
-        w.setContentsMargins(0, 0, 0 ,0)
+        w.setContentsMargins(0, 0, 0, 0)
 
         h_layout = QtWidgets.QHBoxLayout()
 
@@ -82,7 +82,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._top_pane = QtWidgets.QWidget(self)
 
         top_layout = QtWidgets.QVBoxLayout()
-        top_layout.setContentsMargins(0, 0, 0 ,0)
+        top_layout.setContentsMargins(0, 0, 0, 0)
 
         self._title = QtWidgets.QLabel("")
         font = self._title.font()
@@ -101,6 +101,44 @@ class MainWindow(QtWidgets.QMainWindow):
         top_layout.addStretch()
 
         bottom_h_layout = QtWidgets.QHBoxLayout()
+
+        button_h_layout = QtWidgets.QHBoxLayout()
+        button_h_layout.setContentsMargins(0, 0, 0, 0)
+        button_h_layout.setSpacing(4)
+
+        scradio_dir = os.path.dirname(os.path.realpath(__file__))
+        icon_dir = os.path.join(scradio_dir, "icons")
+
+        self._prev_icon = QtGui.QIcon(os.path.join(icon_dir, "prev.svg"))
+        self._prev_button = QtWidgets.QPushButton()
+        self._prev_button.setIcon(self._prev_icon)
+        self._prev_button.setIconSize(QtCore.QSize(32, 32))
+        self._prev_button.setFixedSize(QtCore.QSize(32, 32))
+        self._prev_button.setStyleSheet("QPushButton {border:none}")
+        self._prev_button.setEnabled(False)
+        button_h_layout.addWidget(self._prev_button)
+
+        self._play_icon = QtGui.QIcon(os.path.join(icon_dir, "play.svg"))
+        self._pause_icon = QtGui.QIcon(os.path.join(icon_dir, "pause.svg"))
+        self._play_pause_button = QtWidgets.QPushButton()
+        self._play_pause_button.setIcon(self._play_icon)
+        self._play_pause_button.setIconSize(QtCore.QSize(32, 32))
+        self._play_pause_button.setFixedSize(QtCore.QSize(32, 32))
+        self._play_pause_button.setStyleSheet("QPushButton {border:none}")
+        self._play_pause_button.setEnabled(False)
+        button_h_layout.addWidget(self._play_pause_button)
+
+        self._next_icon = QtGui.QIcon(os.path.join(icon_dir, "next.svg"))
+        self._next_button = QtWidgets.QPushButton()
+        self._next_button.setIcon(self._next_icon)
+        self._next_button.setIconSize(QtCore.QSize(32, 32))
+        self._next_button.setFixedSize(QtCore.QSize(32, 32))
+        self._next_button.setStyleSheet("QPushButton {border:none}")
+        self._next_button.setEnabled(False)
+        button_h_layout.addWidget(self._next_button)
+
+        bottom_h_layout.addLayout(button_h_layout)
+
         self._volume_slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
         self._volume_slider.setTickPosition(QtWidgets.QSlider.NoTicks)
         self._volume_slider.setTracking(True)
@@ -111,7 +149,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self._device_combo_box = QtWidgets.QComboBox()
         bottom_h_layout.addWidget(self._device_combo_box)
-        bottom_h_layout.setContentsMargins(0, 0, 0 ,0)
+        bottom_h_layout.setContentsMargins(0, 0, 0, 0)
 
         top_layout.addLayout(bottom_h_layout)
 
@@ -126,6 +164,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self._device_combo_box.setEnabled(False)
         self._volume_slider.setEnabled(False)
+
+        self._prev_button.clicked.connect(self.onPrevious)
+        self._play_pause_button.clicked.connect(self.onPlayPause)
+        self._next_button.clicked.connect(self.onNext)
 
         self._device_combo_box.currentIndexChanged.connect(self.onCurrentDeviceChanged)
         self._volume_slider.valueChanged.connect(self.onVolumeChanged)
@@ -240,9 +282,11 @@ class MainWindow(QtWidgets.QMainWindow):
         if cpb['is_playing'] == True:
             self._spotify.pause_playback(device_id=self._active_device_id)
             self._play_pause.setText("Play")
+            self._play_pause_button.setIcon(self._play_icon)
         else:
             self._spotify.start_playback(device_id=self._active_device_id)
             self._play_pause.setText("Pause")
+            self._play_pause_button.setIcon(self._pause_icon)
 
     def onNext(self):
         """
@@ -372,30 +416,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self._active_device_id = d['id']
                 self._volume = d['volume_percent']
 
-        cpb = self._spotify.current_playback()
-        if cpb is not None:
-            if cpb['is_playing'] == True:
-                self._play_pause.setText("Pause")
-            else:
-                self._play_pause.setText("Play")
-
-            # set current playing track
-            self._title.setText(cpb['item']['name'])
-            artists = []
-            for a in cpb['item']['artists']:
-                artists.append(a['name'])
-            self._artists.setText(", ".join(artists))
-
-        images = cpb['item']['album']['images']
-        for img in images:
-            if (img['height'] >= self.ALBUM_IMAGE_HT) and (img['height'] <= 600):
-                img_url = img['url']
-
-        img_req = QtNetwork.QNetworkRequest(QtCore.QUrl(img_url))
-        self._nam.get(img_req)
-
-        # fill in upcoming track
-        # queue = self._spotify.current_playback()
+        self.updateCurrentlyPlaying()
 
         # devices
         self._device_combo_box.blockSignals(True)
@@ -422,8 +443,37 @@ class MainWindow(QtWidgets.QMainWindow):
             self._volume_slider.setValue(self._volume)
             self._volume_slider.blockSignals(False)
 
+        self._prev_button.setEnabled(True)
+        self._play_pause_button.setEnabled(True)
+        self._next_button.setEnabled(True)
+
         self._device_combo_box.setEnabled(True)
         self._volume_slider.setEnabled(True)
+
+    def updateCurrentlyPlaying(self):
+        cpb = self._spotify.current_playback()
+        if cpb is not None:
+            if cpb['is_playing'] == True:
+                self._play_pause.setText("Pause")
+                self._play_pause_button.setIcon(self._pause_icon)
+            else:
+                self._play_pause.setText("Play")
+                self._play_pause_button.setIcon(self._play_icon)
+
+            # set current playing track
+            self._title.setText(cpb['item']['name'])
+            artists = []
+            for a in cpb['item']['artists']:
+                artists.append(a['name'])
+            self._artists.setText(", ".join(artists))
+
+            images = cpb['item']['album']['images']
+            for img in images:
+                if (img['height'] >= self.ALBUM_IMAGE_HT) and (img['height'] <= 600):
+                    img_url = img['url']
+
+            img_req = QtNetwork.QNetworkRequest(QtCore.QUrl(img_url))
+            self._nam.get(img_req)
 
     def setupDB(self, db):
         """

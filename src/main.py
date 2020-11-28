@@ -12,7 +12,6 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 from MainWindow import MainWindow
 from DB import DB
 
-
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, signal.SIG_DFL)
 
