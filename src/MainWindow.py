@@ -293,12 +293,14 @@ class MainWindow(QtWidgets.QMainWindow):
         Skip to the next track
         """
         self._spotify.next_track(device_id=self._active_device_id)
+        QtCore.QTimer.singleShot(500, self.updateCurrentlyPlaying)
 
     def onPrevious(self):
         """
         Jump to the previous track
         """
         self._spotify.previous_track(device_id=self._active_device_id)
+        QtCore.QTimer.singleShot(500, self.updateCurrentlyPlaying)
 
     def onVolumeUp(self):
         """
