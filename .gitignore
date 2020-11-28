@@ -1,5 +1,6 @@
 *.pyc
 .cache-*
+.caches*
 .config.yml
 src/spotify_creds.py
 
