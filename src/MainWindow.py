@@ -45,7 +45,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._developer_window = None
 
         self._station_by_composer_dlg = StationByComposerDialog(self)
-        self._station_by_composer_dlg.finished.connect(self.onNewStationByComposerPlay)
+        self._station_by_composer_dlg.accepted.connect(self.onNewStationByComposerPlay)
 
         server.signaler.connectToSpotify.connect(self.setupSpotify)
 
