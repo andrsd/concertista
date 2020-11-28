@@ -6,8 +6,10 @@ import os
 import io
 import yaml
 import random
-from PyQt5 import QtWidgets, QtCore, QtNetwork, QtGui
 import consts
+import server
+
+from PyQt5 import QtWidgets, QtCore, QtNetwork, QtGui
 from AboutDialog import AboutDialog
 from StationByComposerDialog import StationByComposerDialog
 from DeveloperWindow import DeveloperWindow
@@ -44,6 +46,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self._station_by_composer_dlg = StationByComposerDialog(self)
         self._station_by_composer_dlg.finished.connect(self.onNewStationByComposerPlay)
+
+        server.signaler.connectToSpotify.connect(self.setupSpotify)
 
         self._nam = QtNetwork.QNetworkAccessManager()
         self._nam.finished.connect(self.onNetworkReply)
@@ -118,6 +122,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         w.setLayout(h_layout)
         self.setCentralWidget(w)
+
+        self._device_combo_box.setEnabled(False)
+        self._volume_slider.setEnabled(False)
 
         self._device_combo_box.currentIndexChanged.connect(self.onCurrentDeviceChanged)
         self._volume_slider.valueChanged.connect(self.onVolumeChanged)
@@ -344,6 +351,10 @@ class MainWindow(QtWidgets.QMainWindow):
             self.restoreGeometry(geom)
         self._settings.endGroup()
 
+    def connectToSpotify(self):
+        spotify_req = QtNetwork.QNetworkRequest(QtCore.QUrl("http://localhost:{}".format(server.port)))
+        self._nam.get(spotify_req)
+
     def setupSpotify(self, spotify):
         self._spotify = spotify
         if spotify is None:
@@ -410,6 +421,9 @@ class MainWindow(QtWidgets.QMainWindow):
             self._volume_slider.setValue(self._volume)
             self._volume_slider.blockSignals(False)
 
+        self._device_combo_box.setEnabled(True)
+        self._volume_slider.setEnabled(True)
+
     def setupDB(self, db):
         """
         Setup the database object
@@ -421,10 +435,12 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         Called when network request was finished
         """
-        img = QtGui.QImage()
-        img.load(reply, "")
-        # img.scaled(self.ALBUM_IMAGE_WD, self.ALBUM_IMAGE_HT, QtCore.Qt.KeepAspectRatio)
-        # img.scaled(self.ALBUM_IMAGE_WD, self.ALBUM_IMAGE_HT)
-        scaled_img = img.scaledToWidth(self.ALBUM_IMAGE_WD)
-        pixmap = QtGui.QPixmap.fromImage(scaled_img)
-        self._image.setPixmap(pixmap)
+        if reply.url().host() == "localhost":
+            # our own requests
+            return
+        else:
+            img = QtGui.QImage()
+            img.load(reply, "")
+            scaled_img = img.scaledToWidth(self.ALBUM_IMAGE_WD)
+            pixmap = QtGui.QPixmap.fromImage(scaled_img)
+            self._image.setPixmap(pixmap)
