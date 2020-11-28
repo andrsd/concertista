@@ -165,6 +165,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         w.setLayout(h_layout)
         self.setCentralWidget(w)
+        self.setMaximumHeight(152)
 
         self._device_combo_box.setEnabled(False)
         self._volume_slider.setEnabled(False)
