@@ -6,8 +6,10 @@ import os
 import io
 import yaml
 import random
-from PyQt5 import QtWidgets, QtCore, QtNetwork, QtGui
 import consts
+import server
+
+from PyQt5 import QtWidgets, QtCore, QtNetwork, QtGui
 from AboutDialog import AboutDialog
 from StationByComposerDialog import StationByComposerDialog
 from DeveloperWindow import DeveloperWindow
@@ -45,10 +47,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self._station_by_composer_dlg = StationByComposerDialog(self)
         self._station_by_composer_dlg.finished.connect(self.onNewStationByComposerPlay)
 
+        server.signaler.connectToSpotify.connect(self.setupSpotify)
+
         self._nam = QtNetwork.QNetworkAccessManager()
         self._nam.finished.connect(self.onNetworkReply)
 
         self.readSettings()
+        self.setWindowTitle("Player")
         self.setupWidgets()
         self.setupMenuBar()
         self.updateMenuBar()
@@ -119,6 +124,9 @@ class MainWindow(QtWidgets.QMainWindow):
         w.setLayout(h_layout)
         self.setCentralWidget(w)
 
+        self._device_combo_box.setEnabled(False)
+        self._volume_slider.setEnabled(False)
+
         self._device_combo_box.currentIndexChanged.connect(self.onCurrentDeviceChanged)
         self._volume_slider.valueChanged.connect(self.onVolumeChanged)
 
@@ -155,7 +163,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.onBringAllToFront)
 
         self._window_menu.addSeparator()
-        self._show_main_window = self._window_menu.addAction("Spotify Classical Radio", self.onShowMainWindow)
+        self._show_main_window = self._window_menu.addAction("Player", self.onShowMainWindow)
         self._show_main_window.setCheckable(True)
 
         self._action_group_windows = QtWidgets.QActionGroup(self)
@@ -337,12 +345,16 @@ class MainWindow(QtWidgets.QMainWindow):
         geom = self._settings.value("geometry")
         if geom is None:
             screen_rc = QtWidgets.QApplication.desktop().screenGeometry()
-            wnd_wd = 450
-            wnd_ht = int(0.9 * screen_rc.height())
-            self.setGeometry(QtCore.QRect(screen_rc.width() - wnd_wd - 10, (screen_rc.height() - wnd_ht) / 2, wnd_wd, wnd_ht))
+            wnd_wd = 600
+            wnd_ht = 152
+            self.setGeometry(QtCore.QRect(screen_rc.width() - wnd_wd - 10, 10, wnd_wd, wnd_ht))
         else:
             self.restoreGeometry(geom)
         self._settings.endGroup()
+
+    def connectToSpotify(self):
+        spotify_req = QtNetwork.QNetworkRequest(QtCore.QUrl("http://localhost:{}".format(server.port)))
+        self._nam.get(spotify_req)
 
     def setupSpotify(self, spotify):
         self._spotify = spotify
@@ -410,6 +422,9 @@ class MainWindow(QtWidgets.QMainWindow):
             self._volume_slider.setValue(self._volume)
             self._volume_slider.blockSignals(False)
 
+        self._device_combo_box.setEnabled(True)
+        self._volume_slider.setEnabled(True)
+
     def setupDB(self, db):
         """
         Setup the database object
@@ -421,10 +436,12 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         Called when network request was finished
         """
-        img = QtGui.QImage()
-        img.load(reply, "")
-        # img.scaled(self.ALBUM_IMAGE_WD, self.ALBUM_IMAGE_HT, QtCore.Qt.KeepAspectRatio)
-        # img.scaled(self.ALBUM_IMAGE_WD, self.ALBUM_IMAGE_HT)
-        scaled_img = img.scaledToWidth(self.ALBUM_IMAGE_WD)
-        pixmap = QtGui.QPixmap.fromImage(scaled_img)
-        self._image.setPixmap(pixmap)
+        if reply.url().host() == "localhost":
+            # our own requests
+            return
+        else:
+            img = QtGui.QImage()
+            img.load(reply, "")
+            scaled_img = img.scaledToWidth(self.ALBUM_IMAGE_WD)
+            pixmap = QtGui.QPixmap.fromImage(scaled_img)
+            self._image.setPixmap(pixmap)

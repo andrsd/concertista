@@ -1,6 +1,7 @@
 *.pyc
 .cache-*
 .config.yml
+src/spotify_creds.py
 
 # py2app
 .eggs/*
