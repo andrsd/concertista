@@ -3,7 +3,6 @@ DB.py
 """
 import os
 import yaml
-import uuid
 
 class DB:
     """
@@ -46,8 +45,7 @@ class DB:
                         with open(root + '/' + file, 'rt') as f:
                             piece = yaml.safe_load(f)
 
-                        id = uuid.uuid4()
-                        piece_id = id.hex;
+                        piece_id = piece['id']
                         self._pieces[piece_id] = piece
 
                         composer_id = piece['composer_id']
