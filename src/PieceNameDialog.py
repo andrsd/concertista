@@ -4,6 +4,7 @@ PieceNameDialog.py
 
 import io
 import yaml
+import uuid
 from PyQt5 import QtWidgets, QtCore, QtGui
 
 class PieceNameDialog(QtWidgets.QDialog):
@@ -72,6 +73,7 @@ class PieceNameDialog(QtWidgets.QDialog):
                 track_ids.append(track['id'])
 
             obj = {
+                "id": uuid.uuid4().hex,
                 "composer_id": self._artist['id'],
                 "name": self._piece_name_edit.text(),
                 "album_id": self._album['id'],
