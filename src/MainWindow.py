@@ -10,8 +10,9 @@ import consts
 import server
 
 from PyQt5 import QtWidgets, QtCore, QtNetwork, QtGui
+from DB import DB
 from AboutDialog import AboutDialog
-from StationByComposerDialog import StationByComposerDialog
+from StationSearchDialog import StationSearchDialog
 from PreferencesWindow import PreferencesWindow
 from DeveloperWindow import DeveloperWindow
 
@@ -30,7 +31,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         # database
-        self._db = None
+        self._db = DB("spotify")
+        self.loadDB()
         # market for spotify
         self._market = 'US'
         # Spotify object
@@ -43,14 +45,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self._active_device_id = None
         self._current_title = ""
         self._current_artists = []
+        self._volume = None
         self._settings = QtCore.QSettings()
         self._about_dlg = None
         self._preferences_window = PreferencesWindow(self)
         self._preferences_window.preferencesUpdated.connect(self.onPreferencesUpdated)
         self._developer_window = None
 
-        self._station_by_composer_dlg = StationByComposerDialog(self)
-        self._station_by_composer_dlg.accepted.connect(self.onNewStationByComposerPlay)
+        self._station_search_dlg = StationSearchDialog(self._db, self)
+        self._station_search_dlg.accepted.connect(self.onStationSearchPlay)
 
         server.signaler.connectToSpotify.connect(self.setupSpotify)
 
@@ -188,7 +191,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self._station_menu = self._menubar.addMenu("Station")
         self._new_station = self._station_menu.addAction("New", self.onNewStation, "Ctrl+N")
-        self._new_station_by_composer = self._station_menu.addAction("By composer", self.onNewStationByComposer)
+        self._station_search = self._station_menu.addAction("Search...", self.onStationSearch, "Ctrl+F")
 
         self._dev_separator = self._station_menu.addSeparator()
         self._developer = self._station_menu.addAction("Developer", self.onDeveloper, "Ctrl+Alt+I")
@@ -240,7 +243,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         Randomize list of pieces and start playing
         """
-        rng = random.sample(piece_ids, k = 3)
+        rng = random.sample(piece_ids, k = min(len(piece_ids), 3))
         pieces = self._db.get_pieces()
 
         # add the tracks
@@ -265,19 +268,23 @@ class MainWindow(QtWidgets.QMainWindow):
         pieces = self._db.get_pieces()
         self.randomizePiecesAndPlay(list(pieces.keys()))
 
-    def onNewStationByComposer(self):
+    def onStationSearch(self):
         """
-        Open the new station using composer name dialog
+        Open the new station from search dialog
         """
-        self._station_by_composer_dlg.open()
+        self._station_search_dlg.open()
 
-    def onNewStationByComposerPlay(self):
+    def onStationSearchPlay(self):
         """
-        Start playing pieces from a composer
+        Start playing pieces according to a search
         """
-        composer_id = self._station_by_composer_dlg._artist["id"]
-        pieces_ids = self._db.get_composer_pieces(composer_id)
-        self.randomizePiecesAndPlay(pieces_ids)
+        type = self._station_search_dlg.db_item['type']
+        id = self._station_search_dlg.db_item['id']
+        if type == 'piece':
+            self.randomizePiecesAndPlay([id])
+        elif type == 'composer':
+            piece_ids = self._db.get_composer_pieces(id)
+            self.randomizePiecesAndPlay(piece_ids)
 
     def onDeveloper(self):
         """
@@ -502,26 +509,26 @@ class MainWindow(QtWidgets.QMainWindow):
                 self._play_pause.setText("Play")
                 self._play_pause_button.setIcon(self._play_icon)
 
-            self._current_title = cpb['item']['name']
-            self._current_artists = []
-            for a in cpb['item']['artists']:
-                self._current_artists.append(a['name'])
-            self.updateCurrentlyPlayingTitle()
+            if ('item' in cpb) and (cpb['item'] is not None):
+                self._current_title = cpb['item']['name']
+                self._current_artists = []
+                for a in cpb['item']['artists']:
+                    self._current_artists.append(a['name'])
+                self.updateCurrentlyPlayingTitle()
 
-            images = cpb['item']['album']['images']
-            for img in images:
-                if (img['height'] >= self.ALBUM_IMAGE_HT) and (img['height'] <= 600):
-                    img_url = img['url']
+                images = cpb['item']['album']['images']
+                for img in images:
+                    if (img['height'] >= self.ALBUM_IMAGE_HT) and (img['height'] <= 600):
+                        img_url = img['url']
 
-            img_req = QtNetwork.QNetworkRequest(QtCore.QUrl(img_url))
-            self._nam.get(img_req)
+                img_req = QtNetwork.QNetworkRequest(QtCore.QUrl(img_url))
+                self._nam.get(img_req)
 
-    def setupDB(self, db):
+    def loadDB(self):
         """
-        Setup the database object
+        Load the database
         """
-        self._db = db
-        self._station_by_composer_dlg.setupDB(db)
+        self._db.load()
 
     def onNetworkReply(self, reply):
         """

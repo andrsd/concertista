@@ -3,6 +3,7 @@ DB.py
 """
 import os
 import yaml
+from PyQt5 import QtCore, QtGui
 
 class DB:
     """
@@ -11,10 +12,11 @@ class DB:
 
     def __init__(self, dir):
         self._dir = dir
-        self._composers = []
+        self._composers = {}
         self._pieces = {}
         # composer_id -> dict(piece ids)
         self._pieces_by_composers = {}
+        self._completer_model = None
 
     def load(self):
         """
@@ -22,19 +24,25 @@ class DB:
         """
         self._load_composers()
         self._load_pieces()
+        self._build_completer_model()
 
     def get_pieces(self):
         return self._pieces
 
-    def get_composers(self):
-        return self._composers
-
     def get_composer_pieces(self, composer_id):
         return self._pieces_by_composers[composer_id]
 
+    def get_completer_model(self):
+        return self._completer_model
+
     def _load_composers(self):
+        composers = []
         with open(self._dir + '/composers.yml', 'rt') as f:
-            self._composers = yaml.safe_load(f)
+            composers = yaml.safe_load(f)
+
+        for c in composers:
+            id = c['id']
+            self._composers[id] = c;
 
     def _load_pieces(self):
         for root, dirs, files in os.walk(self._dir + "/tracks"):
@@ -54,3 +62,23 @@ class DB:
                         self._pieces_by_composers[composer_id].append(piece_id)
                     except:
                         print("Error loading file:", file)
+
+    def _build_completer_model(self):
+        scradio_dir = os.path.dirname(os.path.realpath(__file__))
+        icon_dir = os.path.join(scradio_dir, "icons")
+        self._author_icon = QtGui.QIcon(os.path.join(icon_dir, "author.svg"))
+        self._piece_icon = QtGui.QIcon(os.path.join(icon_dir, "vinyl.svg"))
+
+        self._completer_model = QtGui.QStandardItemModel()
+
+        for id, composer in self._composers.items():
+            si = QtGui.QStandardItem(self._author_icon, "{}".format(composer['name']))
+            si.setData({"type": "composer", "id": id})
+            self._completer_model.appendRow(si)
+            self._completer_model.setData(si.index(), QtCore.QSize(20, 20), QtCore.Qt.SizeHintRole)
+
+        for id, piece in self._pieces.items():
+            si = QtGui.QStandardItem(self._piece_icon, "{}: {}".format(piece['name'], self._composers[piece['composer_id']]['name']))
+            si.setData({"type": "piece", "id": id})
+            self._completer_model.appendRow(si)
+            self._completer_model.setData(si.index(), QtCore.QSize(20, 20), QtCore.Qt.SizeHintRole)

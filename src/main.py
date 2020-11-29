@@ -10,7 +10,6 @@ import server
 
 from PyQt5 import QtWidgets, QtGui, QtCore
 from MainWindow import MainWindow
-from DB import DB
 
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, signal.SIG_DFL)
@@ -25,12 +24,7 @@ if __name__ == '__main__':
     server_thread = server.ServerThread()
     server_thread.start()
 
-    # read the db
-    db = DB("spotify")
-    db.load()
-
     window = MainWindow()
-    window.setupDB(db)
     window.connectToSpotify()
     window.show()
 
