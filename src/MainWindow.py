@@ -12,6 +12,7 @@ import server
 from PyQt5 import QtWidgets, QtCore, QtNetwork, QtGui
 from AboutDialog import AboutDialog
 from StationByComposerDialog import StationByComposerDialog
+from PreferencesWindow import PreferencesWindow
 from DeveloperWindow import DeveloperWindow
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -44,6 +45,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self._current_artists = []
         self._settings = QtCore.QSettings()
         self._about_dlg = None
+        self._preferences_window = PreferencesWindow(self)
+        self._preferences_window.preferencesUpdated.connect(self.onPreferencesUpdated)
         self._developer_window = None
 
         self._station_by_composer_dlg = StationByComposerDialog(self)
@@ -186,12 +189,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self._station_menu = self._menubar.addMenu("Station")
         self._new_station = self._station_menu.addAction("New", self.onNewStation, "Ctrl+N")
         self._new_station_by_composer = self._station_menu.addAction("By composer", self.onNewStationByComposer)
-        self._station_menu.addSeparator()
+
+        self._dev_separator = self._station_menu.addSeparator()
         self._developer = self._station_menu.addAction("Developer", self.onDeveloper, "Ctrl+Alt+I")
 
         # The "About" item is fine here, since we assume Mac and that will place the item into
         # different submenu but this will need to be fixed for linux and windows
         self._station_menu.addSeparator()
+        self._preferences_action = self._station_menu.addAction("Preferences...", self.onPreferences)
         self._about_box_action = self._station_menu.addAction("About", self.onAbout)
 
         self._controls_menu = self._menubar.addMenu("Controls")
@@ -226,6 +231,10 @@ class MainWindow(QtWidgets.QMainWindow):
         active_window = qapp.activeWindow()
         if active_window == self:
             self._show_main_window.setChecked(True)
+
+        visible = self._preferences_window.show_developer.isChecked()
+        self._dev_separator.setVisible(visible)
+        self._developer.setVisible(visible)
 
     def randomizePiecesAndPlay(self, piece_ids):
         """
@@ -361,6 +370,18 @@ class MainWindow(QtWidgets.QMainWindow):
         self.showNormal()
         self.activateWindow()
         self.raise_()
+        self.updateMenuBar()
+
+    def onPreferences(self):
+        """
+        Called when 'Preferences' window is requested
+        """
+        self._preferences_window.show()
+
+    def onPreferencesUpdated(self):
+        """
+        Called when 'Preferences' are updated
+        """
         self.updateMenuBar()
 
     def event(self, event):
