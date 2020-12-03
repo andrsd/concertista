@@ -12,6 +12,7 @@ class PreferencesWindow(QtWidgets.QDialog):
 
     def __init__(self, parent = None):
         super().__init__(parent)
+        self.window_action = None
         self.setMinimumWidth(500)
         self.setWindowTitle("Preferences")
         self._settings = QtCore.QSettings()
@@ -76,10 +77,16 @@ class PreferencesWindow(QtWidgets.QDialog):
         """
         self.preferencesUpdated.emit()
 
+    def event(self, e):
+        if e.type() == QtCore.QEvent.WindowActivate:
+            self.window_action.setChecked(True)
+        return super().event(e)
+
     def closeEvent(self, event):
         """
         Called when EventClose is recieved
         """
+        self.window_action.setVisible(False)
         self.writeSettings()
         event.accept()
 

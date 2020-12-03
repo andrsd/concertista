@@ -221,8 +221,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self._show_main_window = self._window_menu.addAction("Player", self.onShowMainWindow)
         self._show_main_window.setCheckable(True)
 
+        self._show_prefs_window = self._window_menu.addAction('\u200C' + "Preferences", self.onShowPreferences)
+        self._show_prefs_window.setCheckable(True)
+        self._show_prefs_window.setVisible(False)
+        self._preferences_window.window_action = self._show_prefs_window
+
         self._action_group_windows = QtWidgets.QActionGroup(self)
         self._action_group_windows.addAction(self._show_main_window)
+        self._action_group_windows.addAction(self._show_prefs_window)
 
         self.setMenuBar(self._menubar)
 
@@ -234,6 +240,8 @@ class MainWindow(QtWidgets.QMainWindow):
         active_window = qapp.activeWindow()
         if active_window == self:
             self._show_main_window.setChecked(True)
+        elif active_window == self._preferences_window:
+            self._show_prefs_window.setChecked(True)
 
         visible = self._preferences_window.show_developer.isChecked()
         self._dev_separator.setVisible(visible)
@@ -379,11 +387,22 @@ class MainWindow(QtWidgets.QMainWindow):
         self.raise_()
         self.updateMenuBar()
 
+    def onShowPreferences(self):
+        """
+        Called when show preferences window action is triggered
+        """
+        self._preferences_window.showNormal()
+        self._preferences_window.activateWindow()
+        self._preferences_window.raise_()
+        self.updateMenuBar()
+
     def onPreferences(self):
         """
         Called when 'Preferences' window is requested
         """
+        self._show_prefs_window.setVisible(True)
         self._preferences_window.show()
+        self.updateMenuBar()
 
     def onPreferencesUpdated(self):
         """
