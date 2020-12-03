@@ -40,9 +40,52 @@ class PreferencesWindow(QtWidgets.QDialog):
         """
         Setup window widgets
         """
+        self.setupMusic()
+        self._vlayout.addSpacing(20)
         self.setupAdvanced()
-        self._vlayout.addStretch()
         self.setLayout(self._vlayout)
+
+    def setupMusic(self):
+        """
+        Setup widgets in 'Music' group
+        """
+        group_label = QtWidgets.QLabel("Music")
+        group_label.setFont(self._group_font)
+        self._vlayout.addWidget(group_label)
+
+        hint = QtWidgets.QLabel("I want to listen to")
+        self._vlayout.addWidget(hint)
+
+        ctrl_layout = QtWidgets.QVBoxLayout()
+        ctrl_layout.setSpacing(10)
+        ctrl_layout.setContentsMargins(0, 0, 0, 0)
+
+        self.entire_library = QtWidgets.QRadioButton("The entire library", self)
+        self.part_library = QtWidgets.QRadioButton("Portion of the library", self)
+
+        self.music_library = QtWidgets.QButtonGroup(self)
+        self.music_library.addButton(self.entire_library, 0)
+        self.music_library.addButton(self.part_library, 1)
+        self.music_library.buttonClicked.connect(self.onMusicLibraryClicked)
+
+        ctrl_layout.addWidget(self.entire_library)
+        ctrl_layout.addWidget(self.part_library)
+
+        tree_layout = QtWidgets.QVBoxLayout()
+        tree_layout.setContentsMargins(20, 0, 0, 0)
+        tree_layout.setSpacing(4)
+
+        self.search_library = QtWidgets.QLineEdit(self)
+        self.search_library.setClearButtonEnabled(True)
+        self.search_library.setPlaceholderText("Filter...")
+        tree_layout.addWidget(self.search_library)
+
+        self.library_tree = QtWidgets.QTreeView(self)
+        tree_layout.addWidget(self.library_tree)
+
+        ctrl_layout.addLayout(tree_layout)
+
+        self._vlayout.addLayout(ctrl_layout)
 
     def setupAdvanced(self):
         """
@@ -76,6 +119,10 @@ class PreferencesWindow(QtWidgets.QDialog):
         """
         Update widgets
         """
+        part_library = self.part_library.isChecked()
+        self.search_library.setEnabled(part_library)
+        self.library_tree.setEnabled(part_library)
+
         self.preferencesUpdated.emit()
 
     def event(self, e):
@@ -91,12 +138,22 @@ class PreferencesWindow(QtWidgets.QDialog):
         self.writeSettings()
         event.accept()
 
+    def onMusicLibraryClicked(self, button):
+        """
+        Called when mucis library radio button was clicked
+        """
+        self.updateWidgets()
+
     def writeSettings(self):
         """
         Write settings
         """
         self._settings.beginGroup("PreferencesWindow")
         self._settings.setValue("geometry", self.saveGeometry())
+        self._settings.endGroup()
+
+        self._settings.beginGroup("Preferences/Music")
+        self._settings.setValue("library_portion", self.music_library.checkedId())
         self._settings.endGroup()
 
         self._settings.beginGroup("Preferences/Advanced")
@@ -113,6 +170,10 @@ class PreferencesWindow(QtWidgets.QDialog):
             pass
         else:
             self.restoreGeometry(geom)
+        self._settings.endGroup()
+
+        self._settings.beginGroup("Preferences/Music")
+        self.music_library.button(self._settings.value("library_portion", 0)).setChecked(True)
         self._settings.endGroup()
 
         self._settings.beginGroup("Preferences/Advanced")
