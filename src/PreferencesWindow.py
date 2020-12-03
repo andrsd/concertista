@@ -15,6 +15,7 @@ class PreferencesWindow(QtWidgets.QDialog):
         self.window_action = None
         self.setMinimumWidth(500)
         self.setWindowTitle("Preferences")
+        self.setWindowFlags((self.windowFlags() | QtCore.Qt.CustomizeWindowHint) & ~QtCore.Qt.WindowMaximizeButtonHint)
         self._settings = QtCore.QSettings()
         self._vlayout = QtWidgets.QVBoxLayout()
 
