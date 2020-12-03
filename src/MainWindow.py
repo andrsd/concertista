@@ -21,8 +21,8 @@ class MainWindow(QtWidgets.QMainWindow):
     Main window
     """
 
-    ALBUM_IMAGE_WD = 128
-    ALBUM_IMAGE_HT = 128
+    ALBUM_IMAGE_WD = 96
+    ALBUM_IMAGE_HT = 96
 
     VOLUME_PAGE_STEP = 5
     VOLUME_MINIMUM = 0
@@ -91,6 +91,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         top_layout = QtWidgets.QVBoxLayout()
         top_layout.setContentsMargins(0, 0, 0, 0)
+        top_layout.setSpacing(2)
 
         self._title = QtWidgets.QLabel("")
         font = self._title.font()
@@ -149,6 +150,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         bottom_h_layout.addLayout(button_h_layout)
 
+        bottom_h_layout.addSpacing(10)
+
         self._volume_slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
         self._volume_slider.setTickPosition(QtWidgets.QSlider.NoTicks)
         self._volume_slider.setTracking(True)
@@ -156,6 +159,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self._volume_slider.setMaximum(self.VOLUME_MAXIMUM)
         self._volume_slider.setPageStep(self.VOLUME_PAGE_STEP)
         bottom_h_layout.addWidget(self._volume_slider)
+
+        bottom_h_layout.addSpacing(15)
 
         self._device_combo_box = QtWidgets.QComboBox()
         bottom_h_layout.addWidget(self._device_combo_box)
@@ -171,7 +176,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         w.setLayout(h_layout)
         self.setCentralWidget(w)
-        self.setMaximumHeight(152)
+        self.setMaximumHeight(self.ALBUM_IMAGE_HT + 24)
 
         self._device_combo_box.setEnabled(False)
         self._volume_slider.setEnabled(False)
@@ -447,7 +452,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if geom is None:
             screen_rc = QtWidgets.QApplication.desktop().screenGeometry()
             wnd_wd = 600
-            wnd_ht = 152
+            wnd_ht = self.ALBUM_IMAGE_HT + 24
             self.setGeometry(QtCore.QRect(screen_rc.width() - wnd_wd - 10, 10, wnd_wd, wnd_ht))
         else:
             self.restoreGeometry(geom)
