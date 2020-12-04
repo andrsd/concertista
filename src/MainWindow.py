@@ -10,8 +10,9 @@ import consts
 import server
 
 from PyQt5 import QtWidgets, QtCore, QtNetwork, QtGui
+from DB import DB
 from AboutDialog import AboutDialog
-from StationByComposerDialog import StationByComposerDialog
+from StationSearchDialog import StationSearchDialog
 from PreferencesWindow import PreferencesWindow
 from DeveloperWindow import DeveloperWindow
 
@@ -20,8 +21,8 @@ class MainWindow(QtWidgets.QMainWindow):
     Main window
     """
 
-    ALBUM_IMAGE_WD = 128
-    ALBUM_IMAGE_HT = 128
+    ALBUM_IMAGE_WD = 96
+    ALBUM_IMAGE_HT = 96
 
     VOLUME_PAGE_STEP = 5
     VOLUME_MINIMUM = 0
@@ -30,7 +31,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         # database
-        self._db = None
+        self._db = DB("spotify")
+        self.loadDB()
         # market for spotify
         self._market = 'US'
         # Spotify object
@@ -43,14 +45,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self._active_device_id = None
         self._current_title = ""
         self._current_artists = []
+        self._volume = None
         self._settings = QtCore.QSettings()
         self._about_dlg = None
-        self._preferences_window = PreferencesWindow(self)
+        self._preferences_window = PreferencesWindow(self._db, self)
         self._preferences_window.preferencesUpdated.connect(self.onPreferencesUpdated)
         self._developer_window = None
 
-        self._station_by_composer_dlg = StationByComposerDialog(self)
-        self._station_by_composer_dlg.accepted.connect(self.onNewStationByComposerPlay)
+        self._station_search_dlg = StationSearchDialog(self._db, self)
+        self._station_search_dlg.accepted.connect(self.onStationSearchPlay)
 
         server.signaler.connectToSpotify.connect(self.setupSpotify)
 
@@ -88,6 +91,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         top_layout = QtWidgets.QVBoxLayout()
         top_layout.setContentsMargins(0, 0, 0, 0)
+        top_layout.setSpacing(2)
 
         self._title = QtWidgets.QLabel("")
         font = self._title.font()
@@ -146,6 +150,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         bottom_h_layout.addLayout(button_h_layout)
 
+        bottom_h_layout.addSpacing(10)
+
         self._volume_slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
         self._volume_slider.setTickPosition(QtWidgets.QSlider.NoTicks)
         self._volume_slider.setTracking(True)
@@ -153,6 +159,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self._volume_slider.setMaximum(self.VOLUME_MAXIMUM)
         self._volume_slider.setPageStep(self.VOLUME_PAGE_STEP)
         bottom_h_layout.addWidget(self._volume_slider)
+
+        bottom_h_layout.addSpacing(15)
 
         self._device_combo_box = QtWidgets.QComboBox()
         bottom_h_layout.addWidget(self._device_combo_box)
@@ -168,7 +176,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         w.setLayout(h_layout)
         self.setCentralWidget(w)
-        self.setMaximumHeight(152)
+        self.setMaximumHeight(self.ALBUM_IMAGE_HT + 24)
 
         self._device_combo_box.setEnabled(False)
         self._volume_slider.setEnabled(False)
@@ -188,7 +196,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self._station_menu = self._menubar.addMenu("Station")
         self._new_station = self._station_menu.addAction("New", self.onNewStation, "Ctrl+N")
-        self._new_station_by_composer = self._station_menu.addAction("By composer", self.onNewStationByComposer)
+        self._station_search = self._station_menu.addAction("Search...", self.onStationSearch, "Ctrl+F")
 
         self._dev_separator = self._station_menu.addSeparator()
         self._developer = self._station_menu.addAction("Developer", self.onDeveloper, "Ctrl+Alt+I")
@@ -218,8 +226,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self._show_main_window = self._window_menu.addAction("Player", self.onShowMainWindow)
         self._show_main_window.setCheckable(True)
 
+        self._show_prefs_window = self._window_menu.addAction('\u200C' + "Preferences", self.onShowPreferences)
+        self._show_prefs_window.setCheckable(True)
+        self._show_prefs_window.setVisible(False)
+        self._preferences_window.window_action = self._show_prefs_window
+
         self._action_group_windows = QtWidgets.QActionGroup(self)
         self._action_group_windows.addAction(self._show_main_window)
+        self._action_group_windows.addAction(self._show_prefs_window)
 
         self.setMenuBar(self._menubar)
 
@@ -231,6 +245,8 @@ class MainWindow(QtWidgets.QMainWindow):
         active_window = qapp.activeWindow()
         if active_window == self:
             self._show_main_window.setChecked(True)
+        elif active_window == self._preferences_window:
+            self._show_prefs_window.setChecked(True)
 
         visible = self._preferences_window.show_developer.isChecked()
         self._dev_separator.setVisible(visible)
@@ -240,7 +256,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         Randomize list of pieces and start playing
         """
-        rng = random.sample(piece_ids, k = 3)
+        rng = random.sample(piece_ids, k = min(len(piece_ids), 3))
         pieces = self._db.get_pieces()
 
         # add the tracks
@@ -262,22 +278,32 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         Start to listen to new music
         """
-        pieces = self._db.get_pieces()
-        self.randomizePiecesAndPlay(list(pieces.keys()))
+        pieces = {}
+        if self._preferences_window.music_library.checkedId() == PreferencesWindow.MUSIC_LIBRARY_ENTIRE:
+            pieces = self._db.get_pieces()
+        else:
+            pieces = self._preferences_window.user_selection
 
-    def onNewStationByComposer(self):
-        """
-        Open the new station using composer name dialog
-        """
-        self._station_by_composer_dlg.open()
+        if len(pieces) > 0:
+            self.randomizePiecesAndPlay(list(pieces.keys()))
 
-    def onNewStationByComposerPlay(self):
+    def onStationSearch(self):
         """
-        Start playing pieces from a composer
+        Open the new station from search dialog
         """
-        composer_id = self._station_by_composer_dlg._artist["id"]
-        pieces_ids = self._db.get_composer_pieces(composer_id)
-        self.randomizePiecesAndPlay(pieces_ids)
+        self._station_search_dlg.open()
+
+    def onStationSearchPlay(self):
+        """
+        Start playing pieces according to a search
+        """
+        type = self._station_search_dlg.db_item['type']
+        id = self._station_search_dlg.db_item['id']
+        if type == 'piece':
+            self.randomizePiecesAndPlay([id])
+        elif type == 'composer':
+            piece_ids = self._db.get_composer_pieces(id)
+            self.randomizePiecesAndPlay(piece_ids)
 
     def onDeveloper(self):
         """
@@ -372,11 +398,22 @@ class MainWindow(QtWidgets.QMainWindow):
         self.raise_()
         self.updateMenuBar()
 
+    def onShowPreferences(self):
+        """
+        Called when show preferences window action is triggered
+        """
+        self._preferences_window.showNormal()
+        self._preferences_window.activateWindow()
+        self._preferences_window.raise_()
+        self.updateMenuBar()
+
     def onPreferences(self):
         """
         Called when 'Preferences' window is requested
         """
+        self._show_prefs_window.setVisible(True)
         self._preferences_window.show()
+        self.updateMenuBar()
 
     def onPreferencesUpdated(self):
         """
@@ -421,7 +458,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if geom is None:
             screen_rc = QtWidgets.QApplication.desktop().screenGeometry()
             wnd_wd = 600
-            wnd_ht = 152
+            wnd_ht = self.ALBUM_IMAGE_HT + 24
             self.setGeometry(QtCore.QRect(screen_rc.width() - wnd_wd - 10, 10, wnd_wd, wnd_ht))
         else:
             self.restoreGeometry(geom)
@@ -502,26 +539,26 @@ class MainWindow(QtWidgets.QMainWindow):
                 self._play_pause.setText("Play")
                 self._play_pause_button.setIcon(self._play_icon)
 
-            self._current_title = cpb['item']['name']
-            self._current_artists = []
-            for a in cpb['item']['artists']:
-                self._current_artists.append(a['name'])
-            self.updateCurrentlyPlayingTitle()
+            if ('item' in cpb) and (cpb['item'] is not None):
+                self._current_title = cpb['item']['name']
+                self._current_artists = []
+                for a in cpb['item']['artists']:
+                    self._current_artists.append(a['name'])
+                self.updateCurrentlyPlayingTitle()
 
-            images = cpb['item']['album']['images']
-            for img in images:
-                if (img['height'] >= self.ALBUM_IMAGE_HT) and (img['height'] <= 600):
-                    img_url = img['url']
+                images = cpb['item']['album']['images']
+                for img in images:
+                    if (img['height'] >= self.ALBUM_IMAGE_HT) and (img['height'] <= 600):
+                        img_url = img['url']
 
-            img_req = QtNetwork.QNetworkRequest(QtCore.QUrl(img_url))
-            self._nam.get(img_req)
+                img_req = QtNetwork.QNetworkRequest(QtCore.QUrl(img_url))
+                self._nam.get(img_req)
 
-    def setupDB(self, db):
+    def loadDB(self):
         """
-        Setup the database object
+        Load the database
         """
-        self._db = db
-        self._station_by_composer_dlg.setupDB(db)
+        self._db.load()
 
     def onNetworkReply(self, reply):
         """
