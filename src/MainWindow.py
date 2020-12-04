@@ -48,7 +48,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._volume = None
         self._settings = QtCore.QSettings()
         self._about_dlg = None
-        self._preferences_window = PreferencesWindow(self)
+        self._preferences_window = PreferencesWindow(self._db, self)
         self._preferences_window.preferencesUpdated.connect(self.onPreferencesUpdated)
         self._developer_window = None
 
@@ -278,8 +278,14 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         Start to listen to new music
         """
-        pieces = self._db.get_pieces()
-        self.randomizePiecesAndPlay(list(pieces.keys()))
+        pieces = {}
+        if self._preferences_window.music_library.checkedId() == PreferencesWindow.MUSIC_LIBRARY_ENTIRE:
+            pieces = self._db.get_pieces()
+        else:
+            pieces = self._preferences_window.user_selection
+
+        if len(pieces) > 0:
+            self.randomizePiecesAndPlay(list(pieces.keys()))
 
     def onStationSearch(self):
         """

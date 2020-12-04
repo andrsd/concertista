@@ -29,6 +29,9 @@ class DB:
     def get_pieces(self):
         return self._pieces
 
+    def get_composers(self):
+        return self._composers
+
     def get_composer_pieces(self, composer_id):
         return self._pieces_by_composers[composer_id]
 
