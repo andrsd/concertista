@@ -208,13 +208,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self._station_search = self._station_menu.addAction("Search...", self.onStationSearch, "Ctrl+F")
 
         self._dev_separator = self._station_menu.addSeparator()
-        self._developer = self._station_menu.addAction("Developer", self.onDeveloper, "Ctrl+Alt+I")
+        self._developer = self._station_menu.addAction("Developer...", self.onDeveloper, "Ctrl+Alt+I")
 
         # The "About" item is fine here, since we assume Mac and that will place the item into
         # different submenu but this will need to be fixed for linux and windows
         self._station_menu.addSeparator()
         self._preferences_action = self._station_menu.addAction("Preferences...", self.onPreferences)
-        self._about_box_action = self._station_menu.addAction("About", self.onAbout)
+        self._about_box_action = self._station_menu.addAction("About...", self.onAbout)
 
         if platform.system() != "Darwin":
             self._station_menu.addSeparator()
