@@ -40,7 +40,7 @@ class DB:
 
     def _load_composers(self):
         composers = []
-        with open(self._dir + '/composers.yml', 'rt') as f:
+        with open(self._dir + '/composers.yml', 'rt', encoding = "utf-8") as f:
             composers = yaml.safe_load(f)
 
         for c in composers:
@@ -53,7 +53,7 @@ class DB:
             for file in files:
                 if file.endswith(('.yml')):
                     try:
-                        with open(root + '/' + file, 'rt') as f:
+                        with open(root + '/' + file, 'rt', encoding = "utf-8") as f:
                             piece = yaml.safe_load(f)
 
                         piece_id = piece['id']

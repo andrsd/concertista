@@ -51,6 +51,7 @@ class PreferencesWindow(QtWidgets.QDialog):
         self.setupFonts()
         self.setupWidgets()
         self.readSettings()
+        self.updateWidgets()
 
     def buildLibraryModel(self):
         composers = self._db.get_composers()
@@ -187,14 +188,16 @@ class PreferencesWindow(QtWidgets.QDialog):
 
     def event(self, e):
         if e.type() == QtCore.QEvent.WindowActivate:
-            self.window_action.setChecked(True)
+            if self.window_action is not None:
+                self.window_action.setChecked(True)
         return super().event(e)
 
     def closeEvent(self, event):
         """
         Called when EventClose is recieved
         """
-        self.window_action.setVisible(False)
+        if self.window_action is not None:
+            self.window_action.setVisible(False)
         self.writeSettings()
         event.accept()
 
@@ -282,5 +285,5 @@ class PreferencesWindow(QtWidgets.QDialog):
         self._settings.endGroup()
 
         self._settings.beginGroup("Preferences/Advanced")
-        self.show_developer.setChecked(self._settings.value("show_develop_menu", False))
+        self.show_developer.setChecked(self._settings.value("show_develop_menu", False, type=bool))
         self._settings.endGroup()

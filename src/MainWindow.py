@@ -3,11 +3,13 @@ MainWindow.py
 """
 
 import os
+import sys
 import io
 import yaml
 import random
 import consts
 import server
+import platform
 
 from PyQt5 import QtWidgets, QtCore, QtNetwork, QtGui
 from DB import DB
@@ -15,6 +17,11 @@ from AboutDialog import AboutDialog
 from StationSearchDialog import StationSearchDialog
 from PreferencesWindow import PreferencesWindow
 from DeveloperWindow import DeveloperWindow
+
+if platform.system() == "Darwin":
+    WINDOW_TITLE = "Player"
+else:
+    WINDOW_TITLE = "Spotify Classical Radio"
 
 class MainWindow(QtWidgets.QMainWindow):
     """
@@ -51,6 +58,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self._preferences_window = PreferencesWindow(self._db, self)
         self._preferences_window.preferencesUpdated.connect(self.onPreferencesUpdated)
         self._developer_window = None
+        self._window_menu = None
+        self._show_prefs_window = None
 
         self._station_search_dlg = StationSearchDialog(self._db, self)
         self._station_search_dlg.accepted.connect(self.onStationSearchPlay)
@@ -61,7 +70,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._nam.finished.connect(self.onNetworkReply)
 
         self.readSettings()
-        self.setWindowTitle("Player")
+        self.setWindowTitle(WINDOW_TITLE)
         self.setupWidgets()
         self.setupMenuBar()
         self.updateMenuBar()
@@ -199,13 +208,18 @@ class MainWindow(QtWidgets.QMainWindow):
         self._station_search = self._station_menu.addAction("Search...", self.onStationSearch, "Ctrl+F")
 
         self._dev_separator = self._station_menu.addSeparator()
-        self._developer = self._station_menu.addAction("Developer", self.onDeveloper, "Ctrl+Alt+I")
+        self._developer = self._station_menu.addAction("Developer...", self.onDeveloper, "Ctrl+Alt+I")
 
         # The "About" item is fine here, since we assume Mac and that will place the item into
         # different submenu but this will need to be fixed for linux and windows
         self._station_menu.addSeparator()
         self._preferences_action = self._station_menu.addAction("Preferences...", self.onPreferences)
-        self._about_box_action = self._station_menu.addAction("About", self.onAbout)
+        self._about_box_action = self._station_menu.addAction("About...", self.onAbout)
+
+        if platform.system() != "Darwin":
+            self._station_menu.addSeparator()
+            self._quit_action = self._station_menu.addAction("Quit", self.close, "Ctrl+Q")
+
 
         self._controls_menu = self._menubar.addMenu("Controls")
         self._play_pause = self._controls_menu.addAction("Play", self.onPlayPause, "Space")
@@ -216,24 +230,25 @@ class MainWindow(QtWidgets.QMainWindow):
         self._volume_down = self._controls_menu.addAction("Decrease Volume", self.onVolumeDown, "Ctrl+Down")
         self._controls_menu.addSeparator()
 
-        self._window_menu = self._menubar.addMenu("Window")
-        self._minimize = self._window_menu.addAction("Minimize", self.onMinimize, "Ctrl+M")
-        self._window_menu.addSeparator()
-        self._bring_all_to_front = self._window_menu.addAction("Bring All to Front",
-            self.onBringAllToFront)
+        if platform.system() == "Darwin":
+            self._window_menu = self._menubar.addMenu("Window")
+            self._minimize = self._window_menu.addAction("Minimize", self.onMinimize, "Ctrl+M")
+            self._window_menu.addSeparator()
+            self._bring_all_to_front = self._window_menu.addAction("Bring All to Front",
+                self.onBringAllToFront)
 
-        self._window_menu.addSeparator()
-        self._show_main_window = self._window_menu.addAction("Player", self.onShowMainWindow)
-        self._show_main_window.setCheckable(True)
+            self._window_menu.addSeparator()
+            self._show_main_window = self._window_menu.addAction("Player", self.onShowMainWindow)
+            self._show_main_window.setCheckable(True)
 
-        self._show_prefs_window = self._window_menu.addAction('\u200C' + "Preferences", self.onShowPreferences)
-        self._show_prefs_window.setCheckable(True)
-        self._show_prefs_window.setVisible(False)
-        self._preferences_window.window_action = self._show_prefs_window
+            self._show_prefs_window = self._window_menu.addAction('\u200C' + "Preferences", self.onShowPreferences)
+            self._show_prefs_window.setCheckable(True)
+            self._show_prefs_window.setVisible(False)
+            self._preferences_window.window_action = self._show_prefs_window
 
-        self._action_group_windows = QtWidgets.QActionGroup(self)
-        self._action_group_windows.addAction(self._show_main_window)
-        self._action_group_windows.addAction(self._show_prefs_window)
+            self._action_group_windows = QtWidgets.QActionGroup(self)
+            self._action_group_windows.addAction(self._show_main_window)
+            self._action_group_windows.addAction(self._show_prefs_window)
 
         self.setMenuBar(self._menubar)
 
@@ -241,12 +256,13 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         Update menu bar
         """
-        qapp = QtWidgets.QApplication.instance()
-        active_window = qapp.activeWindow()
-        if active_window == self:
-            self._show_main_window.setChecked(True)
-        elif active_window == self._preferences_window:
-            self._show_prefs_window.setChecked(True)
+        if self._window_menu is not None:
+            qapp = QtWidgets.QApplication.instance()
+            active_window = qapp.activeWindow()
+            if active_window == self:
+                self._show_main_window.setChecked(True)
+            elif active_window == self._preferences_window:
+                self._show_prefs_window.setChecked(True)
 
         visible = self._preferences_window.show_developer.isChecked()
         self._dev_separator.setVisible(visible)
@@ -411,7 +427,8 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         Called when 'Preferences' window is requested
         """
-        self._show_prefs_window.setVisible(True)
+        if self._show_prefs_window is not None:
+            self._show_prefs_window.setVisible(True)
         self._preferences_window.show()
         self.updateMenuBar()
 
@@ -438,6 +455,8 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         self.writeSettings()
         event.accept()
+        if platform.system() != "Darwin":
+            sys.exit()
 
     def writeSettings(self):
         """
