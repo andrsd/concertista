@@ -188,14 +188,16 @@ class PreferencesWindow(QtWidgets.QDialog):
 
     def event(self, e):
         if e.type() == QtCore.QEvent.WindowActivate:
-            self.window_action.setChecked(True)
+            if self.window_action is not None:
+                self.window_action.setChecked(True)
         return super().event(e)
 
     def closeEvent(self, event):
         """
         Called when EventClose is recieved
         """
-        self.window_action.setVisible(False)
+        if self.window_action is not None:
+            self.window_action.setVisible(False)
         self.writeSettings()
         event.accept()
 

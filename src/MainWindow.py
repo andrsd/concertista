@@ -58,6 +58,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self._preferences_window = PreferencesWindow(self._db, self)
         self._preferences_window.preferencesUpdated.connect(self.onPreferencesUpdated)
         self._developer_window = None
+        self._window_menu = None
+        self._show_prefs_window = None
 
         self._station_search_dlg = StationSearchDialog(self._db, self)
         self._station_search_dlg.accepted.connect(self.onStationSearchPlay)
@@ -228,24 +230,25 @@ class MainWindow(QtWidgets.QMainWindow):
         self._volume_down = self._controls_menu.addAction("Decrease Volume", self.onVolumeDown, "Ctrl+Down")
         self._controls_menu.addSeparator()
 
-        self._window_menu = self._menubar.addMenu("Window")
-        self._minimize = self._window_menu.addAction("Minimize", self.onMinimize, "Ctrl+M")
-        self._window_menu.addSeparator()
-        self._bring_all_to_front = self._window_menu.addAction("Bring All to Front",
-            self.onBringAllToFront)
+        if platform.system() == "Darwin":
+            self._window_menu = self._menubar.addMenu("Window")
+            self._minimize = self._window_menu.addAction("Minimize", self.onMinimize, "Ctrl+M")
+            self._window_menu.addSeparator()
+            self._bring_all_to_front = self._window_menu.addAction("Bring All to Front",
+                self.onBringAllToFront)
 
-        self._window_menu.addSeparator()
-        self._show_main_window = self._window_menu.addAction("Player", self.onShowMainWindow)
-        self._show_main_window.setCheckable(True)
+            self._window_menu.addSeparator()
+            self._show_main_window = self._window_menu.addAction("Player", self.onShowMainWindow)
+            self._show_main_window.setCheckable(True)
 
-        self._show_prefs_window = self._window_menu.addAction('\u200C' + "Preferences", self.onShowPreferences)
-        self._show_prefs_window.setCheckable(True)
-        self._show_prefs_window.setVisible(False)
-        self._preferences_window.window_action = self._show_prefs_window
+            self._show_prefs_window = self._window_menu.addAction('\u200C' + "Preferences", self.onShowPreferences)
+            self._show_prefs_window.setCheckable(True)
+            self._show_prefs_window.setVisible(False)
+            self._preferences_window.window_action = self._show_prefs_window
 
-        self._action_group_windows = QtWidgets.QActionGroup(self)
-        self._action_group_windows.addAction(self._show_main_window)
-        self._action_group_windows.addAction(self._show_prefs_window)
+            self._action_group_windows = QtWidgets.QActionGroup(self)
+            self._action_group_windows.addAction(self._show_main_window)
+            self._action_group_windows.addAction(self._show_prefs_window)
 
         self.setMenuBar(self._menubar)
 
@@ -253,12 +256,13 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         Update menu bar
         """
-        qapp = QtWidgets.QApplication.instance()
-        active_window = qapp.activeWindow()
-        if active_window == self:
-            self._show_main_window.setChecked(True)
-        elif active_window == self._preferences_window:
-            self._show_prefs_window.setChecked(True)
+        if self._window_menu is not None:
+            qapp = QtWidgets.QApplication.instance()
+            active_window = qapp.activeWindow()
+            if active_window == self:
+                self._show_main_window.setChecked(True)
+            elif active_window == self._preferences_window:
+                self._show_prefs_window.setChecked(True)
 
         visible = self._preferences_window.show_developer.isChecked()
         self._dev_separator.setVisible(visible)
@@ -423,7 +427,8 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         Called when 'Preferences' window is requested
         """
-        self._show_prefs_window.setVisible(True)
+        if self._show_prefs_window is not None:
+            self._show_prefs_window.setVisible(True)
         self._preferences_window.show()
         self.updateMenuBar()
 
