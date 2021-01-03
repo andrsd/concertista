@@ -47,6 +47,7 @@ class StationSearchDialog(QtWidgets.QDialog):
         self._layout.addLayout(self._button_layout)
 
         self.setLayout(self._layout)
+        self.setWindowTitle("Search")
 
     def updateWidgets(self):
         """
