@@ -218,7 +218,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if platform.system() != "Darwin":
             self._station_menu.addSeparator()
-            self._quit_action = self._station_menu.addAction("Quit", self.close)
+            self._quit_action = self._station_menu.addAction("Quit", self.close, "Ctrl+Q")
 
 
         self._controls_menu = self._menubar.addMenu("Controls")
