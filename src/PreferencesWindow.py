@@ -282,5 +282,5 @@ class PreferencesWindow(QtWidgets.QDialog):
         self._settings.endGroup()
 
         self._settings.beginGroup("Preferences/Advanced")
-        self.show_developer.setChecked(self._settings.value("show_develop_menu", False))
+        self.show_developer.setChecked(self._settings.value("show_develop_menu", False, type=bool))
         self._settings.endGroup()
