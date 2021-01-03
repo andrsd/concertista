@@ -51,6 +51,7 @@ class PreferencesWindow(QtWidgets.QDialog):
         self.setupFonts()
         self.setupWidgets()
         self.readSettings()
+        self.updateWidgets()
 
     def buildLibraryModel(self):
         composers = self._db.get_composers()
