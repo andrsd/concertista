@@ -80,5 +80,5 @@ class PieceNameDialog(QtWidgets.QDialog):
                 "tracks": track_ids
             }
 
-            with io.open(file_name[0], 'w', encoding = 'utf8') as outfile:
+            with io.open(file_name[0], 'w', encoding = 'utf-8') as outfile:
                 yaml.dump(obj, outfile, default_flow_style = False, allow_unicode = True)
