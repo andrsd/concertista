@@ -44,3 +44,4 @@ class AboutDialog(QtWidgets.QDialog):
         self._layout.addWidget(self._text)
 
         self.setLayout(self._layout)
+        self.setWindowTitle("About")
