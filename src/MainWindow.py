@@ -8,6 +8,7 @@ import yaml
 import random
 import consts
 import server
+import platform
 
 from PyQt5 import QtWidgets, QtCore, QtNetwork, QtGui
 from DB import DB
@@ -15,6 +16,11 @@ from AboutDialog import AboutDialog
 from StationSearchDialog import StationSearchDialog
 from PreferencesWindow import PreferencesWindow
 from DeveloperWindow import DeveloperWindow
+
+if platform.system() == "Darwin":
+    WINDOW_TITLE = "Player"
+else:
+    WINDOW_TITLE = "Spotify Classical Radio"
 
 class MainWindow(QtWidgets.QMainWindow):
     """
@@ -61,7 +67,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._nam.finished.connect(self.onNetworkReply)
 
         self.readSettings()
-        self.setWindowTitle("Player")
+        self.setWindowTitle(WINDOW_TITLE)
         self.setupWidgets()
         self.setupMenuBar()
         self.updateMenuBar()
