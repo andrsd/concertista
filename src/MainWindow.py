@@ -3,6 +3,7 @@ MainWindow.py
 """
 
 import os
+import sys
 import io
 import yaml
 import random
@@ -212,6 +213,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self._station_menu.addSeparator()
         self._preferences_action = self._station_menu.addAction("Preferences...", self.onPreferences)
         self._about_box_action = self._station_menu.addAction("About", self.onAbout)
+
+        if platform.system() != "Darwin":
+            self._station_menu.addSeparator()
+            self._quit_action = self._station_menu.addAction("Quit", self.close)
+
 
         self._controls_menu = self._menubar.addMenu("Controls")
         self._play_pause = self._controls_menu.addAction("Play", self.onPlayPause, "Space")
@@ -444,6 +450,8 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         self.writeSettings()
         event.accept()
+        if platform.system() != "Darwin":
+            sys.exit()
 
     def writeSettings(self):
         """
