@@ -37,6 +37,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def __init__(self):
         super().__init__()
+        random.seed()
         # database
         self._db = DB("music")
         self.loadDB()
@@ -268,14 +269,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self._dev_separator.setVisible(visible)
         self._developer.setVisible(visible)
 
-    def randomizePiecesAndPlay(self, piece_ids):
+    def randomizePieces(self, piece_ids):
         """
-        Randomize list of pieces and start playing
+        Randomize list of pieces
         """
-        rng = random.sample(piece_ids, k = min(len(piece_ids), 3))
+        rng = random.sample(piece_ids, k = len(piece_ids))
         pieces = self._db.get_pieces()
 
-        # add the tracks
+        # if avg. track length is 5 mins, then this will be about 16 hours of music
         max_tracks = 200
         uris = []
         for id in rng:
@@ -284,11 +285,9 @@ class MainWindow(QtWidgets.QMainWindow):
                 uri = "spotify:track:{}".format(track)
                 uris.append(uri)
                 max_tracks = max_tracks - 1
-                if max_tracks == 0:
-                    break
-            if max_tracks == 0:
+            if max_tracks <= 0:
                 break
-        self._spotify.start_playback(device_id=self._active_device_id, uris=uris)
+        return uris
 
     def onNewStation(self):
         """
@@ -302,7 +301,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 pieces = self._preferences_window.user_selection
 
             if len(pieces) > 0:
-                self.randomizePiecesAndPlay(list(pieces.keys()))
+                uris = self.randomizePieces(list(pieces.keys()))
+                self._spotify.start_playback(device_id=self._active_device_id, uris=uris)
         else:
             self.reportUnknownDeviceId()
 
@@ -320,10 +320,12 @@ class MainWindow(QtWidgets.QMainWindow):
             type = self._station_search_dlg.db_item['type']
             id = self._station_search_dlg.db_item['id']
             if type == 'piece':
-                self.randomizePiecesAndPlay([id])
+                uris = self.randomizePieces([id])
+                self._spotify.start_playback(device_id=self._active_device_id, uris=uris)
             elif type == 'composer':
                 piece_ids = self._db.get_composer_pieces(id)
-                self.randomizePiecesAndPlay(piece_ids)
+                uris = self.randomizePieces(piece_ids)
+                self._spotify.start_playback(device_id=self._active_device_id, uris=uris)
         else:
             self.reportUnknownDeviceId()
 
