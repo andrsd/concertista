@@ -379,6 +379,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self._volume_slider.setValue(volume)
 
     def onVolumeChanged(self, value):
+        """
+        Called when volume was changed
+        """
         self._volume = value
         self._spotify.volume(self._volume, device_id=self._active_device_id)
 
@@ -453,6 +456,9 @@ class MainWindow(QtWidgets.QMainWindow):
         return super().event(event)
 
     def resizeEvent(self, event):
+        """
+        Resize event
+        """
         self.updateCurrentlyPlayingTitle()
 
     def closeEvent(self, event):
@@ -490,10 +496,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self._settings.endGroup()
 
     def connectToSpotify(self):
+        """
+        Connect to Spotify via our local HTTP server
+        """
         spotify_req = QtNetwork.QNetworkRequest(QtCore.QUrl("http://localhost:{}".format(server.port)))
         self._nam.get(spotify_req)
 
     def setupSpotify(self, spotify):
+        """
+        Link Spotify information to our internal data
+        """
         self._spotify = spotify
         if spotify is None:
             return
@@ -544,6 +556,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self._volume_slider.setEnabled(True)
 
     def updateCurrentlyPlayingTitle(self):
+        """
+        Update title and artists of currently playing track
+        """
         title = self._current_title
         metrics = QtGui.QFontMetrics(self._title.font())
         text = metrics.elidedText(title, QtCore.Qt.ElideRight, self._title.width())
@@ -555,6 +570,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self._artists.setText(text)
 
     def updateCurrentlyPlaying(self):
+        """
+        Update information of currenlty playing track
+        """
         cpb = self._spotify.current_playback()
         if cpb is not None:
             if cpb['is_playing'] == True:
