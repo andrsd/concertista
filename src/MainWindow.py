@@ -35,6 +35,9 @@ class MainWindow(QtWidgets.QMainWindow):
     VOLUME_MINIMUM = 0
     VOLUME_MAXIMUM = 100
 
+    # delay in milliseconds for updating player status (assumes good connection to Spotify)
+    UPDATE_DELAY_MS = 500
+
     def __init__(self):
         super().__init__()
         random.seed()
@@ -357,14 +360,14 @@ class MainWindow(QtWidgets.QMainWindow):
         Skip to the next track
         """
         self._spotify.next_track(device_id=self._active_device_id)
-        QtCore.QTimer.singleShot(500, self.updateCurrentlyPlaying)
+        QtCore.QTimer.singleShot(self.UPDATE_DELAY_MS, self.updateCurrentlyPlaying)
 
     def onPrevious(self):
         """
         Jump to the previous track
         """
         self._spotify.previous_track(device_id=self._active_device_id)
-        QtCore.QTimer.singleShot(500, self.updateCurrentlyPlaying)
+        QtCore.QTimer.singleShot(self.UPDATE_DELAY_MS, self.updateCurrentlyPlaying)
 
     def onVolumeUp(self):
         """
