@@ -294,14 +294,17 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         Start to listen to new music
         """
-        pieces = {}
-        if self._preferences_window.music_library.checkedId() == PreferencesWindow.MUSIC_LIBRARY_ENTIRE:
-            pieces = self._db.get_pieces()
-        else:
-            pieces = self._preferences_window.user_selection
+        if self._active_device_id is not None:
+            pieces = {}
+            if self._preferences_window.music_library.checkedId() == PreferencesWindow.MUSIC_LIBRARY_ENTIRE:
+                pieces = self._db.get_pieces()
+            else:
+                pieces = self._preferences_window.user_selection
 
-        if len(pieces) > 0:
-            self.randomizePiecesAndPlay(list(pieces.keys()))
+            if len(pieces) > 0:
+                self.randomizePiecesAndPlay(list(pieces.keys()))
+        else:
+            self.reportUnknownDeviceId()
 
     def onStationSearch(self):
         """
@@ -313,13 +316,16 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         Start playing pieces according to a search
         """
-        type = self._station_search_dlg.db_item['type']
-        id = self._station_search_dlg.db_item['id']
-        if type == 'piece':
-            self.randomizePiecesAndPlay([id])
-        elif type == 'composer':
-            piece_ids = self._db.get_composer_pieces(id)
-            self.randomizePiecesAndPlay(piece_ids)
+        if self._active_device_id is not None:
+            type = self._station_search_dlg.db_item['type']
+            id = self._station_search_dlg.db_item['id']
+            if type == 'piece':
+                self.randomizePiecesAndPlay([id])
+            elif type == 'composer':
+                piece_ids = self._db.get_composer_pieces(id)
+                self.randomizePiecesAndPlay(piece_ids)
+        else:
+            self.reportUnknownDeviceId()
 
     def onDeveloper(self):
         """
@@ -592,3 +598,18 @@ class MainWindow(QtWidgets.QMainWindow):
             scaled_img = img.scaledToWidth(self.ALBUM_IMAGE_WD)
             pixmap = QtGui.QPixmap.fromImage(scaled_img)
             self._image.setPixmap(pixmap)
+
+    def reportUnknownDeviceId(self):
+        """
+        Show message box reporting unknown device ID
+        """
+        mb = QtWidgets.QMessageBox(self)
+        mb.setIcon(QtWidgets.QMessageBox.Critical)
+        mb.setWindowTitle("Error")
+        mb.addButton(QtWidgets.QMessageBox.Ok)
+        mb.setText("Device ID unknown")
+        mb.setInformativeText("Try restarting Spotify and then this application.")
+        horizontalSpacer = QtWidgets.QSpacerItem(400, 0, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        layout = mb.layout()
+        layout.addItem(horizontalSpacer, layout.rowCount(), 0, 1, layout.columnCount())
+        mb.exec()
