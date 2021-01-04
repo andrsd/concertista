@@ -457,7 +457,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def closeEvent(self, event):
         """
-        Called when EventClose is recieved
+        Called when EventClose is received
         """
         self.writeSettings()
         event.accept()
