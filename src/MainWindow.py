@@ -38,7 +38,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         # database
-        self._db = DB("spotify")
+        self._db = DB("music")
         self.loadDB()
         # market for spotify
         self._market = 'US'
