@@ -22,7 +22,7 @@ class AboutDialog(QtWidgets.QDialog):
         self._icon.setPixmap(icon.pixmap(64, 64))
         self._layout.addWidget(self._icon, 0, QtCore.Qt.AlignHCenter)
 
-        self._title = QtWidgets.QLabel("Spotify Classical Radio")
+        self._title = QtWidgets.QLabel("Concertista")
         font = self._title.font()
         font.setBold(True)
         font.setPointSize(int(1.2 * font.pointSize()))

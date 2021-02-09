@@ -1,4 +1,4 @@
-## Spotify Classical Radio
+## Concertista
 
 This application fills your spotify listening queue with classical music. It does not add it track by track, but it respects the composer's pieces.
 

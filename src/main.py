@@ -1,5 +1,5 @@
 """
-Spotify Classical Radio
+Concertista
 """
 
 import sys

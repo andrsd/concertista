@@ -21,7 +21,7 @@ from DeveloperWindow import DeveloperWindow
 if platform.system() == "Darwin":
     WINDOW_TITLE = "Player"
 else:
-    WINDOW_TITLE = "Spotify Classical Radio"
+    WINDOW_TITLE = "Concertista"
 
 class MainWindow(QtWidgets.QMainWindow):
     """

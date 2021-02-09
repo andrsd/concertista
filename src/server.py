@@ -50,7 +50,7 @@ def index():
     spotify = spotipy.Spotify(auth_manager=auth_manager)
     signaler.connectToSpotify.emit(spotify)
     return f'<center>'\
-           f'<h1>Spotify Classical Radio</h1>' \
+           f'<h1>Concertista</h1>' \
            f'{spotify.me()["display_name"]}, access to your account was granted. <br/>' \
            f'You can close this window, now.' \
            f'</center>'
