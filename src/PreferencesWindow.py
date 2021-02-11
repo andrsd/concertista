@@ -203,7 +203,7 @@ class PreferencesWindow(QtWidgets.QDialog):
 
     def onMusicLibraryClicked(self, button):
         """
-        Called when mucis library radio button was clicked
+        Called when music library radio button was clicked
         """
         self.updateWidgets()
 
