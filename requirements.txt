@@ -1,4 +1,4 @@
-PyQt5==5.15
+PyQt5==5.15.2
 pyaml==20.4.0
 spotipy==2.16.1
 Flask==1.1.2
