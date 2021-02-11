@@ -13,7 +13,7 @@ from spotify_creds import *
 from PyQt5 import QtCore
 
 # port where we run  our http server so we can talk to spotify
-port = int(os.environ.get("SPOTIFY_CLASSICAL_RADIO_PORT", 9182))
+port = int(os.environ.get("CONCERTISTA_PORT", 9182))
 
 app = Flask(__name__)
 
@@ -22,7 +22,7 @@ if not os.path.exists(caches_folder):
     os.makedirs(caches_folder)
 
 def session_cache_path():
-    return caches_folder + 'spotify-classical-radio'
+    return caches_folder + 'concertista'
 
 @app.route('/')
 def index():

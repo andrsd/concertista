@@ -130,8 +130,8 @@ class MainWindow(QtWidgets.QMainWindow):
         button_h_layout.setContentsMargins(0, 0, 0, 0)
         button_h_layout.setSpacing(4)
 
-        scradio_dir = os.path.dirname(os.path.realpath(__file__))
-        icon_dir = os.path.join(scradio_dir, "icons")
+        concertista_dir = os.path.dirname(os.path.realpath(__file__))
+        icon_dir = os.path.join(concertista_dir, "icons")
 
         self._prev_icon = QtGui.QIcon(os.path.join(icon_dir, "prev.svg"))
         self._prev_button = QtWidgets.QPushButton()

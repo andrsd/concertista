@@ -67,8 +67,8 @@ class DB:
                         print("Error loading file:", file)
 
     def _build_completer_model(self):
-        scradio_dir = os.path.dirname(os.path.realpath(__file__))
-        icon_dir = os.path.join(scradio_dir, "icons")
+        concertista_dir = os.path.dirname(os.path.realpath(__file__))
+        icon_dir = os.path.join(concertista_dir, "icons")
         self._author_icon = QtGui.QIcon(os.path.join(icon_dir, "author.svg"))
         self._piece_icon = QtGui.QIcon(os.path.join(icon_dir, "vinyl.svg"))
 
