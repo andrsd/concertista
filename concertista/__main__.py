@@ -16,7 +16,7 @@ if __name__ == '__main__':
 
     QtCore.QCoreApplication.setOrganizationName("David Andrs")
     QtCore.QCoreApplication.setOrganizationDomain("name.andrs")
-    QtCore.QCoreApplication.setApplicationName("Concertista")
+    QtCore.QCoreApplication.setApplicationName(consts.APP_NAME)
 
     qapp = QtWidgets.QApplication(sys.argv)
     qapp.setQuitOnLastWindowClosed(False)

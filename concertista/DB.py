@@ -3,6 +3,7 @@ DB.py
 """
 import os
 import yaml
+import consts
 from PyQt5 import QtCore, QtGui
 
 class DB:
@@ -10,8 +11,7 @@ class DB:
     Database with the music
     """
 
-    def __init__(self, dir):
-        self._dir = dir
+    def __init__(self):
         self._composers = {}
         self._pieces = {}
         # composer_id -> dict(piece ids)
@@ -40,7 +40,7 @@ class DB:
 
     def _load_composers(self):
         composers = []
-        with open(self._dir + '/composers.yml', 'rt', encoding = "utf-8") as f:
+        with open(consts.MUSIC_DIR + '/composers.yml', 'rt', encoding = "utf-8") as f:
             composers = yaml.safe_load(f)
 
         for c in composers:
@@ -48,7 +48,7 @@ class DB:
             self._composers[id] = c;
 
     def _load_pieces(self):
-        for root, dirs, files in os.walk(self._dir + "/tracks"):
+        for root, dirs, files in os.walk(consts.MUSIC_DIR + "/tracks"):
             path = root.split(os.sep)
             for file in files:
                 if file.endswith(('.yml')):
@@ -67,10 +67,8 @@ class DB:
                         print("Error loading file:", file)
 
     def _build_completer_model(self):
-        concertista_dir = os.path.dirname(os.path.realpath(__file__))
-        icon_dir = os.path.join(concertista_dir, "icons")
-        self._author_icon = QtGui.QIcon(os.path.join(icon_dir, "author.svg"))
-        self._piece_icon = QtGui.QIcon(os.path.join(icon_dir, "vinyl.svg"))
+        self._author_icon = QtGui.QIcon(os.path.join(consts.ICONS_DIR, "author.svg"))
+        self._piece_icon = QtGui.QIcon(os.path.join(consts.ICONS_DIR, "vinyl.svg"))
 
         self._completer_model = QtGui.QStandardItemModel()
 

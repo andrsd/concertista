@@ -42,7 +42,7 @@ class MainWindow(QtWidgets.QMainWindow):
         super().__init__()
         random.seed()
         # database
-        self._db = DB("music")
+        self._db = DB()
         self.loadDB()
         # market for spotify
         self._market = 'US'
@@ -130,10 +130,7 @@ class MainWindow(QtWidgets.QMainWindow):
         button_h_layout.setContentsMargins(0, 0, 0, 0)
         button_h_layout.setSpacing(4)
 
-        concertista_dir = os.path.dirname(os.path.realpath(__file__))
-        icon_dir = os.path.join(concertista_dir, "icons")
-
-        self._prev_icon = QtGui.QIcon(os.path.join(icon_dir, "prev.svg"))
+        self._prev_icon = QtGui.QIcon(os.path.join(consts.ICONS_DIR, "prev.svg"))
         self._prev_button = QtWidgets.QPushButton()
         self._prev_button.setIcon(self._prev_icon)
         self._prev_button.setIconSize(QtCore.QSize(32, 32))
@@ -142,8 +139,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self._prev_button.setEnabled(False)
         button_h_layout.addWidget(self._prev_button)
 
-        self._play_icon = QtGui.QIcon(os.path.join(icon_dir, "play.svg"))
-        self._pause_icon = QtGui.QIcon(os.path.join(icon_dir, "pause.svg"))
+        self._play_icon = QtGui.QIcon(os.path.join(consts.ICONS_DIR, "play.svg"))
+        self._pause_icon = QtGui.QIcon(os.path.join(consts.ICONS_DIR, "pause.svg"))
         self._play_pause_button = QtWidgets.QPushButton()
         self._play_pause_button.setIcon(self._play_icon)
         self._play_pause_button.setIconSize(QtCore.QSize(32, 32))
@@ -152,7 +149,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._play_pause_button.setEnabled(False)
         button_h_layout.addWidget(self._play_pause_button)
 
-        self._next_icon = QtGui.QIcon(os.path.join(icon_dir, "next.svg"))
+        self._next_icon = QtGui.QIcon(os.path.join(consts.ICONS_DIR, "next.svg"))
         self._next_button = QtWidgets.QPushButton()
         self._next_button.setIcon(self._next_icon)
         self._next_button.setIconSize(QtCore.QSize(32, 32))

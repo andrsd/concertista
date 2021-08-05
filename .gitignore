@@ -2,12 +2,16 @@
 .cache-*
 .caches*
 .config.yml
-src/spotify_creds.py
+concertista/spotify_creds.py
 
 # py2app
 .eggs/*
 venv/*
 icon.icns
+dist/*
+build/*
+# pyinstaller
+*.spec
 
 # garbagge created by me
 tmp/*
