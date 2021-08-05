@@ -11,18 +11,19 @@ from spotipy.oauth2 import SpotifyOAuth
 from spotify_creds import *
 
 from PyQt5 import QtCore
+from pathlib import Path
 
 # port where we run  our http server so we can talk to spotify
 port = int(os.environ.get("CONCERTISTA_PORT", 9182))
 
 app = Flask(__name__)
 
-caches_folder = './.caches/'
+caches_folder = str(Path.home()) + '/.cache/concertista/'
 if not os.path.exists(caches_folder):
     os.makedirs(caches_folder)
 
 def session_cache_path():
-    return caches_folder + 'concertista'
+    return caches_folder + 'spotify'
 
 @app.route('/')
 def index():
