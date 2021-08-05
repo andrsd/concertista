@@ -43,11 +43,19 @@ PyInstaller.__main__.run([
 ])
 
 outfilename = os.path.join('dist', f'{appname}-{consts.VERSION}-{sys.platform}')
-print(f'Zipping output to {outfilename}.zip')
-shutil.make_archive(
-    outfilename,
-    'zip',
-    root_dir='dist',
-    base_dir=appname)
 
+if sys.platform.startswith('darwin'):
+    print(f'Creating archive: {outfilename}.tar.gz')
+    shutil.make_archive(
+        outfilename,
+        'gztar',
+        root_dir = 'dist',
+        base_dir = appname + f'.app')
+else:
+    print(f'Creating archive: {outfilename}.zip')
+    shutil.make_archive(
+        outfilename,
+        'zip',
+        root_dir = 'dist',
+        base_dir = appname)
 print('Done')
