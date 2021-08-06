@@ -7,12 +7,12 @@ header:
   overlay_image:
   actions:
     - label: "<i class='fas fa-download'></i> Download for MacOS X"
-      url: "https://github.com/andrsd/concertista/releases/tag/1.0/Concertista-1.0.pkg"
+      url: "https://github.com/andrsd/concertista/releases/download/v1.0/Concertista-1.0.pkg"
     - label: "<i class='fas fa-download'></i> Download for Windows"
-      url: "https://github.com/andrsd/concertista/releases/tag/1.0/Concertista-1.0.zip"
+      url: "https://github.com/andrsd/concertista/releases/download/v1.0/Concertista-1.0-win32.zip"
 excerpt: >
   Finally, we can listen to concert music as we are supposed to.<br />
-  <small><a href="https://github.com/andrsd/concertista/releases/tag/1.0">Latest release v1.0</a></small>
+  <small><a href="https://github.com/andrsd/concertista/releases/tag/v1.0">Latest release v1.0</a></small>
 
 feature_row:
   - image_path:
