@@ -5,7 +5,7 @@ DeveloperAlbumsWindow.py
 import io
 import yaml
 from PyQt5 import QtWidgets, QtCore, QtGui
-from PieceNameDialog import PieceNameDialog
+from concertista.PieceNameDialog import PieceNameDialog
 
 class DeveloperAlbumsWindow(QtWidgets.QMainWindow):
     """

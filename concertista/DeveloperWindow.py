@@ -4,8 +4,8 @@ DeveloperWindow.py
 
 import yaml
 from PyQt5 import QtWidgets, QtCore, QtGui
-from DeveloperAlbumsWindow import DeveloperAlbumsWindow
-from PieceNameDialog import PieceNameDialog
+from concertista.DeveloperAlbumsWindow import DeveloperAlbumsWindow
+from concertista.PieceNameDialog import PieceNameDialog
 
 class DeveloperWindow(QtWidgets.QMainWindow):
     """

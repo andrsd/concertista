@@ -3,7 +3,7 @@ AboutDialog.py
 """
 
 from PyQt5 import QtCore, QtWidgets
-import consts
+from concertista import consts
 
 class AboutDialog(QtWidgets.QDialog):
     """ About dialog """

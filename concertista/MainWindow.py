@@ -7,16 +7,16 @@ import sys
 import io
 import yaml
 import random
-import consts
-import server
+from concertista import consts
+from concertista import server
 import platform
 
 from PyQt5 import QtWidgets, QtCore, QtNetwork, QtGui
-from DB import DB
-from AboutDialog import AboutDialog
-from StationSearchDialog import StationSearchDialog
-from PreferencesWindow import PreferencesWindow
-from DeveloperWindow import DeveloperWindow
+from concertista.DB import DB
+from concertista.AboutDialog import AboutDialog
+from concertista.StationSearchDialog import StationSearchDialog
+from concertista.PreferencesWindow import PreferencesWindow
+from concertista.DeveloperWindow import DeveloperWindow
 
 if platform.system() == "Darwin":
     WINDOW_TITLE = "Player"
