@@ -8,7 +8,7 @@ from waitress import serve
 import spotipy
 import spotipy.util
 from spotipy.oauth2 import SpotifyOAuth
-if os.environ.get("GITHUB_ACTIONS", "false") == "true":
+if 'CI_TEST' in os.environ:
     SPOTIFY_CLIENT_ID = 'ID'
     SPOTIFY_CLIENT_SECRET = 's3cr3t'
     SPOTIFY_REDIRECT_URI = 'http://localhost:9182'

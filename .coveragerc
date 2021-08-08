@@ -4,8 +4,6 @@ omit =
     concertista/__main__.py
 
 [report]
-fail_under = 30
-show_missing = True
 exclude_lines =
     pragma: no cover
     def __repr__
