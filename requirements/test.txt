@@ -1,0 +1,5 @@
+-r requirements.txt
+coverage
+httpretty
+pytest
+pytest-qt>=4
