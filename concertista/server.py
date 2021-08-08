@@ -8,7 +8,12 @@ from waitress import serve
 import spotipy
 import spotipy.util
 from spotipy.oauth2 import SpotifyOAuth
-from spotify_creds import *
+if os.environ.get("GITHUB_ACTIONS", "false") == "true":
+    SPOTIFY_CLIENT_ID = 'ID'
+    SPOTIFY_CLIENT_SECRET = 's3cr3t'
+    SPOTIFY_REDIRECT_URI = 'http://localhost:9182'
+else: # pragma: no cover
+    from concertista.spotify_creds import *
 
 from PyQt5 import QtCore
 from pathlib import Path

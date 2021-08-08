@@ -3,7 +3,7 @@ DB.py
 """
 import os
 import yaml
-import consts
+from concertista import consts
 from PyQt5 import QtCore, QtGui
 
 class DB:

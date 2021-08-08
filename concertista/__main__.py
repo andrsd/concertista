@@ -5,11 +5,11 @@ Concertista
 import sys
 import os
 import signal
-import consts
-import server
+from concertista import consts
+from concertista import server
 
 from PyQt5 import QtWidgets, QtGui, QtCore
-from MainWindow import MainWindow
+from concertista.MainWindow import MainWindow
 
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, signal.SIG_DFL)
