@@ -43,9 +43,10 @@ class DB:
         with open(consts.MUSIC_DIR + '/composers.yml', 'rt', encoding = "utf-8") as f:
             composers = yaml.safe_load(f)
 
-        for c in composers:
-            id = c['id']
-            self._composers[id] = c;
+        if composers is not None:
+            for c in composers:
+                id = c['id']
+                self._composers[id] = c;
 
     def _load_pieces(self):
         for root, dirs, files in os.walk(consts.MUSIC_DIR + "/tracks"):

@@ -1,0 +1,8 @@
+album_id: a987
+composer_id: 1234
+id: id001
+name: Piece 1
+tracks:
+- 123
+- 456
+- 789

@@ -76,7 +76,7 @@ class ServerThread(QtCore.QThread):
 
 class Signaler(QtCore.QObject):
     """
-    Singaler class to communicate with Qt
+    Signaler class to communicate with Qt
     """
 
     connectToSpotify = QtCore.pyqtSignal(object)
