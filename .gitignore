@@ -2,6 +2,7 @@
 .cache-*
 .caches*
 .config.yml
+*.egg-info/
 concertista/spotify_creds.py
 
 # py2app
