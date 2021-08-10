@@ -13,7 +13,8 @@ setup(
         'pyaml==20.4.0',
         'spotipy==2.16.1',
         'Flask==2.0.1',
-        'waitress==1.4.4'
+        'waitress==1.4.4',
+        'python-dotenv>=0.15.0'
     ],
     packages=[
         'concertista',

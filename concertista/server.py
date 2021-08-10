@@ -4,16 +4,16 @@ import webbrowser
 
 from flask import Flask, request, redirect
 from waitress import serve
+from dotenv import load_dotenv
 
 import spotipy
 import spotipy.util
 from spotipy.oauth2 import SpotifyOAuth
-if 'CI_TEST' in os.environ:
-    SPOTIFY_CLIENT_ID = 'ID'
-    SPOTIFY_CLIENT_SECRET = 's3cr3t'
-    SPOTIFY_REDIRECT_URI = 'http://localhost:9182'
-else: # pragma: no cover
-    from concertista.spotify_creds import *
+
+load_dotenv()
+SPOTIFY_CLIENT_ID = os.getenv('SPOTIFY_CLIENT_ID')
+SPOTIFY_CLIENT_SECRET = os.getenv('SPOTIFY_CLIENT_SECRET')
+SPOTIFY_REDIRECT_URI = 'http://localhost:9182'
 
 from PyQt5 import QtCore
 from pathlib import Path

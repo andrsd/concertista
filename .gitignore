@@ -3,7 +3,7 @@
 .caches*
 .config.yml
 *.egg-info/
-concertista/spotify_creds.py
+.env
 
 # py2app
 .eggs/*
