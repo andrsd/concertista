@@ -42,20 +42,22 @@ PyInstaller.__main__.run([
     'concertista/__main__.py'
 ])
 
-outfilename = os.path.join('dist', f'{appname}-{consts.VERSION}-{sys.platform}')
+outfilename = os.path.join(
+    'dist',
+    f'{appname}-{consts.VERSION}-{sys.platform}')
 
 if sys.platform.startswith('darwin'):
     print(f'Creating archive: {outfilename}.tar.gz')
     shutil.make_archive(
         outfilename,
         'gztar',
-        root_dir = 'dist',
-        base_dir = appname + f'.app')
+        root_dir='dist',
+        base_dir=appname + '.app')
 else:
     print(f'Creating archive: {outfilename}.zip')
     shutil.make_archive(
         outfilename,
         'zip',
-        root_dir = 'dist',
-        base_dir = appname)
+        root_dir='dist',
+        base_dir=appname)
 print('Done')

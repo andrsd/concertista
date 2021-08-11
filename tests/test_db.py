@@ -6,12 +6,14 @@ from concertista.DB import DB
 
 dir = Path(__file__).parent
 
+
 def test_db_init(qtbot):
     db = DB()
     assert db._composers == {}
     assert db._pieces == {}
     assert db._pieces_by_composers == {}
-    assert db._completer_model == None
+    assert db._completer_model is None
+
 
 def test_load_empty_db(qtbot):
     consts.MUSIC_DIR = os.path.join(dir, 'assets', 'music-empty')
@@ -20,7 +22,8 @@ def test_load_empty_db(qtbot):
     assert db._composers == {}
     assert db._pieces == {}
     assert db._pieces_by_composers == {}
-    assert db._completer_model != None
+    assert db._completer_model is not None
+
 
 def test_load_simple_db(qtbot):
     consts.MUSIC_DIR = os.path.join(dir, 'assets', 'music')

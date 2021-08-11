@@ -4,8 +4,6 @@ MainWindow.py
 
 import os
 import sys
-import io
-import yaml
 import random
 from concertista import consts
 from concertista import server
@@ -23,6 +21,7 @@ if platform.system() == "Darwin":
 else:
     WINDOW_TITLE = "Concertista"
 
+
 class MainWindow(QtWidgets.QMainWindow):
     """
     Main window
@@ -35,7 +34,8 @@ class MainWindow(QtWidgets.QMainWindow):
     VOLUME_MINIMUM = 0
     VOLUME_MAXIMUM = 100
 
-    # delay in milliseconds for updating player status (assumes good connection to Spotify)
+    # delay in milliseconds for updating player status (assumes good connection
+    # to Spotify)
     UPDATE_DELAY_MS = 500
 
     def __init__(self):
@@ -60,7 +60,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self._settings = QtCore.QSettings()
         self._about_dlg = None
         self._preferences_window = PreferencesWindow(self._db, self)
-        self._preferences_window.preferencesUpdated.connect(self.onPreferencesUpdated)
+        self._preferences_window.preferencesUpdated.connect(
+            self.onPreferencesUpdated)
         self._developer_window = None
         self._window_menu = None
         self._show_prefs_window = None
@@ -130,7 +131,8 @@ class MainWindow(QtWidgets.QMainWindow):
         button_h_layout.setContentsMargins(0, 0, 0, 0)
         button_h_layout.setSpacing(4)
 
-        self._prev_icon = QtGui.QIcon(os.path.join(consts.ICONS_DIR, "prev.svg"))
+        self._prev_icon = QtGui.QIcon(
+            os.path.join(consts.ICONS_DIR, "prev.svg"))
         self._prev_button = QtWidgets.QPushButton()
         self._prev_button.setIcon(self._prev_icon)
         self._prev_button.setIconSize(QtCore.QSize(32, 32))
@@ -139,8 +141,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self._prev_button.setEnabled(False)
         button_h_layout.addWidget(self._prev_button)
 
-        self._play_icon = QtGui.QIcon(os.path.join(consts.ICONS_DIR, "play.svg"))
-        self._pause_icon = QtGui.QIcon(os.path.join(consts.ICONS_DIR, "pause.svg"))
+        self._play_icon = QtGui.QIcon(
+            os.path.join(consts.ICONS_DIR, "play.svg"))
+        self._pause_icon = QtGui.QIcon(
+            os.path.join(consts.ICONS_DIR, "pause.svg"))
         self._play_pause_button = QtWidgets.QPushButton()
         self._play_pause_button.setIcon(self._play_icon)
         self._play_pause_button.setIconSize(QtCore.QSize(32, 32))
@@ -149,7 +153,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self._play_pause_button.setEnabled(False)
         button_h_layout.addWidget(self._play_pause_button)
 
-        self._next_icon = QtGui.QIcon(os.path.join(consts.ICONS_DIR, "next.svg"))
+        self._next_icon = QtGui.QIcon(
+            os.path.join(consts.ICONS_DIR, "next.svg"))
         self._next_button = QtWidgets.QPushButton()
         self._next_button.setIcon(self._next_icon)
         self._next_button.setIconSize(QtCore.QSize(32, 32))
@@ -195,7 +200,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self._play_pause_button.clicked.connect(self.onPlayPause)
         self._next_button.clicked.connect(self.onNext)
 
-        self._device_combo_box.currentIndexChanged.connect(self.onCurrentDeviceChanged)
+        self._device_combo_box.currentIndexChanged.connect(
+            self.onCurrentDeviceChanged)
         self._volume_slider.valueChanged.connect(self.onVolumeChanged)
 
     def setupMenuBar(self):
@@ -205,44 +211,58 @@ class MainWindow(QtWidgets.QMainWindow):
         self._menubar = QtWidgets.QMenuBar(self)
 
         self._station_menu = self._menubar.addMenu("Station")
-        self._new_station = self._station_menu.addAction("New", self.onNewStation, "Ctrl+N")
-        self._station_search = self._station_menu.addAction("Search...", self.onStationSearch, "Ctrl+F")
+        self._new_station = self._station_menu.addAction(
+            "New", self.onNewStation, "Ctrl+N")
+        self._station_search = self._station_menu.addAction(
+            "Search...", self.onStationSearch, "Ctrl+F")
 
         self._dev_separator = self._station_menu.addSeparator()
-        self._developer = self._station_menu.addAction("Developer...", self.onDeveloper, "Ctrl+Alt+I")
+        self._developer = self._station_menu.addAction(
+            "Developer...", self.onDeveloper, "Ctrl+Alt+I")
 
-        # The "About" item is fine here, since we assume Mac and that will place the item into
-        # different submenu but this will need to be fixed for linux and windows
+        # The "About" item is fine here, since we assume Mac and that will
+        # place the item into  different submenu but this will need to be fixed
+        # for linux and windows
         self._station_menu.addSeparator()
-        self._preferences_action = self._station_menu.addAction("Preferences...", self.onPreferences)
-        self._about_box_action = self._station_menu.addAction("About...", self.onAbout)
+        self._preferences_action = self._station_menu.addAction(
+            "Preferences...", self.onPreferences)
+        self._about_box_action = self._station_menu.addAction(
+            "About...", self.onAbout)
 
         if platform.system() != "Darwin":
             self._station_menu.addSeparator()
-            self._quit_action = self._station_menu.addAction("Quit", self.close, "Ctrl+Q")
-
+            self._quit_action = self._station_menu.addAction(
+                "Quit", self.close, "Ctrl+Q")
 
         self._controls_menu = self._menubar.addMenu("Controls")
-        self._play_pause = self._controls_menu.addAction("Play", self.onPlayPause, "Space")
-        self._next = self._controls_menu.addAction("Next", self.onNext, "Ctrl+Right")
-        self._previous = self._controls_menu.addAction("Previous", self.onPrevious, "Ctrl+Left")
+        self._play_pause = self._controls_menu.addAction(
+            "Play", self.onPlayPause, "Space")
+        self._next = self._controls_menu.addAction(
+            "Next", self.onNext, "Ctrl+Right")
+        self._previous = self._controls_menu.addAction(
+            "Previous", self.onPrevious, "Ctrl+Left")
         self._controls_menu.addSeparator()
-        self._volume_up = self._controls_menu.addAction("Increase Volume", self.onVolumeUp, "Ctrl+Up")
-        self._volume_down = self._controls_menu.addAction("Decrease Volume", self.onVolumeDown, "Ctrl+Down")
+        self._volume_up = self._controls_menu.addAction(
+            "Increase Volume", self.onVolumeUp, "Ctrl+Up")
+        self._volume_down = self._controls_menu.addAction(
+            "Decrease Volume", self.onVolumeDown, "Ctrl+Down")
         self._controls_menu.addSeparator()
 
         if platform.system() == "Darwin":
             self._window_menu = self._menubar.addMenu("Window")
-            self._minimize = self._window_menu.addAction("Minimize", self.onMinimize, "Ctrl+M")
+            self._minimize = self._window_menu.addAction(
+                "Minimize", self.onMinimize, "Ctrl+M")
             self._window_menu.addSeparator()
-            self._bring_all_to_front = self._window_menu.addAction("Bring All to Front",
-                self.onBringAllToFront)
+            self._bring_all_to_front = self._window_menu.addAction(
+                "Bring All to Front", self.onBringAllToFront)
 
             self._window_menu.addSeparator()
-            self._show_main_window = self._window_menu.addAction("Player", self.onShowMainWindow)
+            self._show_main_window = self._window_menu.addAction(
+                "Player", self.onShowMainWindow)
             self._show_main_window.setCheckable(True)
 
-            self._show_prefs_window = self._window_menu.addAction('\u200C' + "Preferences", self.onShowPreferences)
+            self._show_prefs_window = self._window_menu.addAction(
+                '\u200C' + "Preferences", self.onShowPreferences)
             self._show_prefs_window.setCheckable(True)
             self._show_prefs_window.setVisible(False)
             self._preferences_window.window_action = self._show_prefs_window
@@ -273,10 +293,11 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         Randomize list of pieces
         """
-        rng = random.sample(piece_ids, k = len(piece_ids))
+        rng = random.sample(piece_ids, k=len(piece_ids))
         pieces = self._db.get_pieces()
 
-        # if avg. track length is 5 mins, then this will be about 16 hours of music
+        # if avg. track length is 5 mins, then this will be about 16 hours of
+        # music
         max_tracks = 200
         uris = []
         for id in rng:
@@ -295,14 +316,17 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         if self._active_device_id is not None:
             pieces = {}
-            if self._preferences_window.music_library.checkedId() == PreferencesWindow.MUSIC_LIBRARY_ENTIRE:
+            if (self._preferences_window.music_library.checkedId() ==
+                    PreferencesWindow.MUSIC_LIBRARY_ENTIRE):
                 pieces = self._db.get_pieces()
             else:
                 pieces = self._preferences_window.user_selection
 
             if len(pieces) > 0:
                 uris = self.randomizePieces(list(pieces.keys()))
-                self._spotify.start_playback(device_id=self._active_device_id, uris=uris)
+                self._spotify.start_playback(
+                    device_id=self._active_device_id,
+                    uris=uris)
         else:
             self.reportUnknownDeviceId()
 
@@ -321,11 +345,15 @@ class MainWindow(QtWidgets.QMainWindow):
             id = self._station_search_dlg.db_item['id']
             if type == 'piece':
                 uris = self.randomizePieces([id])
-                self._spotify.start_playback(device_id=self._active_device_id, uris=uris)
+                self._spotify.start_playback(
+                    device_id=self._active_device_id,
+                    uris=uris)
             elif type == 'composer':
                 piece_ids = self._db.get_composer_pieces(id)
                 uris = self.randomizePieces(piece_ids)
-                self._spotify.start_playback(device_id=self._active_device_id, uris=uris)
+                self._spotify.start_playback(
+                    device_id=self._active_device_id,
+                    uris=uris)
         else:
             self.reportUnknownDeviceId()
 
@@ -343,7 +371,7 @@ class MainWindow(QtWidgets.QMainWindow):
         Start/Pause the playback
         """
         cpb = self._spotify.current_playback()
-        if cpb['is_playing'] == True:
+        if cpb['is_playing'] is True:
             self._spotify.pause_playback(device_id=self._active_device_id)
             self._play_pause.setText("Play")
             self._play_pause_button.setIcon(self._play_icon)
@@ -357,14 +385,16 @@ class MainWindow(QtWidgets.QMainWindow):
         Skip to the next track
         """
         self._spotify.next_track(device_id=self._active_device_id)
-        QtCore.QTimer.singleShot(self.UPDATE_DELAY_MS, self.updateCurrentlyPlaying)
+        QtCore.QTimer.singleShot(
+            self.UPDATE_DELAY_MS, self.updateCurrentlyPlaying)
 
     def onPrevious(self):
         """
         Jump to the previous track
         """
         self._spotify.previous_track(device_id=self._active_device_id)
-        QtCore.QTimer.singleShot(self.UPDATE_DELAY_MS, self.updateCurrentlyPlaying)
+        QtCore.QTimer.singleShot(
+            self.UPDATE_DELAY_MS, self.updateCurrentlyPlaying)
 
     def onVolumeUp(self):
         """
@@ -492,7 +522,9 @@ class MainWindow(QtWidgets.QMainWindow):
             screen_rc = QtWidgets.QApplication.desktop().screenGeometry()
             wnd_wd = 600
             wnd_ht = self.ALBUM_IMAGE_HT + 24
-            self.setGeometry(QtCore.QRect(screen_rc.width() - wnd_wd - 10, 10, wnd_wd, wnd_ht))
+            self.setGeometry(QtCore.QRect(
+                screen_rc.width() - wnd_wd - 10, 10,
+                wnd_wd, wnd_ht))
         else:
             self.restoreGeometry(geom)
         self._settings.endGroup()
@@ -501,7 +533,8 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         Connect to Spotify via our local HTTP server
         """
-        spotify_req = QtNetwork.QNetworkRequest(QtCore.QUrl("http://localhost:{}".format(server.port)))
+        spotify_req = QtNetwork.QNetworkRequest(
+            QtCore.QUrl("http://localhost:{}".format(server.port)))
         self._nam.get(spotify_req)
 
     def setupSpotify(self, spotify):
@@ -519,7 +552,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._devices = []
         for d in devs['devices']:
             self._devices.append(d)
-            if d['is_active'] == True:
+            if d['is_active'] is True:
                 self._active_device_id = d['id']
                 self._volume = d['volume_percent']
 
@@ -563,12 +596,14 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         title = self._current_title
         metrics = QtGui.QFontMetrics(self._title.font())
-        text = metrics.elidedText(title, QtCore.Qt.ElideRight, self._title.width())
+        text = metrics.elidedText(
+            title, QtCore.Qt.ElideRight, self._title.width())
         self._title.setText(text)
 
         artists = ", ".join(self._current_artists)
         metrics = QtGui.QFontMetrics(self._artists.font())
-        text = metrics.elidedText(artists, QtCore.Qt.ElideRight, self._artists.width())
+        text = metrics.elidedText(
+            artists, QtCore.Qt.ElideRight, self._artists.width())
         self._artists.setText(text)
 
     def updateCurrentlyPlaying(self):
@@ -577,7 +612,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         cpb = self._spotify.current_playback()
         if cpb is not None:
-            if cpb['is_playing'] == True:
+            if cpb['is_playing'] is True:
                 self._play_pause.setText("Pause")
                 self._play_pause_button.setIcon(self._pause_icon)
             else:
@@ -593,7 +628,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
                 images = cpb['item']['album']['images']
                 for img in images:
-                    if (img['height'] >= self.ALBUM_IMAGE_HT) and (img['height'] <= 600):
+                    if (img['height'] >= self.ALBUM_IMAGE_HT and
+                            img['height'] <= 600):
                         img_url = img['url']
 
                 img_req = QtNetwork.QNetworkRequest(QtCore.QUrl(img_url))
@@ -628,8 +664,12 @@ class MainWindow(QtWidgets.QMainWindow):
         mb.setWindowTitle("Error")
         mb.addButton(QtWidgets.QMessageBox.Ok)
         mb.setText("Device ID unknown")
-        mb.setInformativeText("Try restarting Spotify and then this application.")
-        horizontalSpacer = QtWidgets.QSpacerItem(400, 0, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        mb.setInformativeText(
+            "Try restarting Spotify and then this application.")
+        horizontalSpacer = QtWidgets.QSpacerItem(
+            400, 0,
+            QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         layout = mb.layout()
-        layout.addItem(horizontalSpacer, layout.rowCount(), 0, 1, layout.columnCount())
+        layout.addItem(
+            horizontalSpacer, layout.rowCount(), 0, 1, layout.columnCount())
         mb.exec()

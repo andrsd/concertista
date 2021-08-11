@@ -3,12 +3,11 @@ Concertista
 """
 
 import sys
-import os
 import signal
 from concertista import consts
 from concertista import server
 
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt5 import QtWidgets, QtCore
 from concertista.MainWindow import MainWindow
 
 
@@ -29,7 +28,15 @@ def handle_sigint(signum, frame):
     QtWidgets.QApplication.quit()
 
 
-if __name__ == '__main__':
+def handle_uncaught_exception(exc_type, exc, traceback):
+    print('Unhandled exception', exc_type, exc, traceback)
+    QtWidgets.QApplication.quit()
+
+
+sys.excepthook = handle_uncaught_exception
+
+
+def main():
     QtCore.QCoreApplication.setOrganizationName("David Andrs")
     QtCore.QCoreApplication.setOrganizationDomain("name.andrs")
     QtCore.QCoreApplication.setApplicationName(consts.APP_NAME)
@@ -53,3 +60,7 @@ if __name__ == '__main__':
 
     del window
     del qapp
+
+
+if __name__ == '__main__':
+    main()

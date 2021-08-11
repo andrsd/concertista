@@ -2,9 +2,8 @@
 StationSearchDialog.py
 """
 
-import io
-import yaml
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5 import QtWidgets, QtCore
+
 
 class StationSearchDialog(QtWidgets.QDialog):
     """
@@ -23,7 +22,8 @@ class StationSearchDialog(QtWidgets.QDialog):
         self.search = QtWidgets.QLineEdit(self)
         self.search.setPlaceholderText("What are you looking for?")
         self.search.setClearButtonEnabled(True)
-        self._completer = QtWidgets.QCompleter(self._db.get_completer_model(), self.search)
+        self._completer = QtWidgets.QCompleter(
+            self._db.get_completer_model(), self.search)
         self._completer.setCaseSensitivity(QtCore.Qt.CaseInsensitive)
         self._completer.setFilterMode(QtCore.Qt.MatchContains)
         self.search.setCompleter(self._completer)

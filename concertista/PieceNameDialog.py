@@ -5,7 +5,8 @@ PieceNameDialog.py
 import io
 import yaml
 import uuid
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5 import QtWidgets, QtGui
+
 
 class PieceNameDialog(QtWidgets.QDialog):
     """
@@ -66,7 +67,8 @@ class PieceNameDialog(QtWidgets.QDialog):
         """
         self.accept()
 
-        file_name = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File', '', 'YML (*.yml)')
+        file_name = QtWidgets.QFileDialog.getSaveFileName(
+            self, 'Save File', '', 'YML (*.yml)')
         if file_name[0]:
             track_ids = []
             for track in self._tracks:
@@ -80,5 +82,9 @@ class PieceNameDialog(QtWidgets.QDialog):
                 "tracks": track_ids
             }
 
-            with io.open(file_name[0], 'w', encoding = 'utf-8') as outfile:
-                yaml.dump(obj, outfile, default_flow_style = False, allow_unicode = True)
+            with io.open(file_name[0], 'w', encoding='utf-8') as outfile:
+                yaml.dump(
+                    obj,
+                    outfile,
+                    default_flow_style=False,
+                    allow_unicode=True)

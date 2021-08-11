@@ -4,6 +4,7 @@ PreferencesWindow.py
 
 from PyQt5 import QtWidgets, QtCore, QtGui
 
+
 class TreeProxyFilter(QtCore.QSortFilterProxyModel):
     """
     Filter tree items and show items and theirs childs matching a reg exp
@@ -20,7 +21,7 @@ class TreeProxyFilter(QtCore.QSortFilterProxyModel):
         rows = self.sourceModel().rowCount(index)
         for row in range(rows):
             if self.filterAcceptsRow(row, index):
-                return True;
+                return True
 
         return False
 
@@ -34,7 +35,7 @@ class PreferencesWindow(QtWidgets.QDialog):
     MUSIC_LIBRARY_ENTIRE = 0
     MUSIC_LIBRARY_PORTION = 1
 
-    def __init__(self, db, parent = None):
+    def __init__(self, db, parent=None):
         super().__init__(parent)
         self._db = db
         self.window_action = None
@@ -42,7 +43,9 @@ class PreferencesWindow(QtWidgets.QDialog):
         self.user_selection = {}
         self.setMinimumWidth(500)
         self.setWindowTitle("Preferences")
-        self.setWindowFlags((self.windowFlags() | QtCore.Qt.CustomizeWindowHint) & ~QtCore.Qt.WindowMaximizeButtonHint)
+        self.setWindowFlags(
+            (self.windowFlags() | QtCore.Qt.CustomizeWindowHint) &
+            ~QtCore.Qt.WindowMaximizeButtonHint)
         self._settings = QtCore.QSettings()
         self._vlayout = QtWidgets.QVBoxLayout()
 
@@ -74,7 +77,8 @@ class PreferencesWindow(QtWidgets.QDialog):
 
         self._sort_library_model = TreeProxyFilter()
         self._sort_library_model.setSourceModel(self._library_model)
-        self._sort_library_model.setSortCaseSensitivity(QtCore.Qt.CaseInsensitive)
+        self._sort_library_model.setSortCaseSensitivity(
+            QtCore.Qt.CaseInsensitive)
         self._sort_library_model.setFilterKeyColumn(0)
 
     def setupFonts(self):
@@ -114,12 +118,16 @@ class PreferencesWindow(QtWidgets.QDialog):
         ctrl_layout.setSpacing(10)
         ctrl_layout.setContentsMargins(0, 0, 0, 0)
 
-        self.entire_library = QtWidgets.QRadioButton("The entire library", self)
-        self.part_library = QtWidgets.QRadioButton("Portion of the library", self)
+        self.entire_library = QtWidgets.QRadioButton(
+            "The entire library", self)
+        self.part_library = QtWidgets.QRadioButton(
+            "Portion of the library", self)
 
         self.music_library = QtWidgets.QButtonGroup(self)
-        self.music_library.addButton(self.entire_library, self.MUSIC_LIBRARY_ENTIRE)
-        self.music_library.addButton(self.part_library, self.MUSIC_LIBRARY_PORTION)
+        self.music_library.addButton(
+            self.entire_library, self.MUSIC_LIBRARY_ENTIRE)
+        self.music_library.addButton(
+            self.part_library, self.MUSIC_LIBRARY_PORTION)
         self.music_library.buttonClicked.connect(self.onMusicLibraryClicked)
 
         ctrl_layout.addWidget(self.entire_library)
@@ -215,13 +223,14 @@ class PreferencesWindow(QtWidgets.QDialog):
             checkState = item.checkState()
             if checkState != QtCore.Qt.PartiallyChecked:
                 for i in range(item.rowCount()):
-                   item.child(i).setCheckState(checkState)
+                    item.child(i).setCheckState(checkState)
         else:
             diff = False
             parent = item.parent()
             for j in range(parent.rowCount()):
-               if (j != item.row()) and (item.checkState() != parent.child(j).checkState()):
-                   diff = True
+                if (j != item.row() and
+                        item.checkState() != parent.child(j).checkState()):
+                    diff = True
 
             if diff:
                 parent.setCheckState(QtCore.Qt.PartiallyChecked)
@@ -238,7 +247,8 @@ class PreferencesWindow(QtWidgets.QDialog):
         Called when library search filed is changed
         """
         if len(text) > 1:
-            self._sort_library_model.setFilterRegExp(QtCore.QRegExp(text, QtCore.Qt.CaseInsensitive))
+            self._sort_library_model.setFilterRegExp(
+                QtCore.QRegExp(text, QtCore.Qt.CaseInsensitive))
         else:
             self._sort_library_model.setFilterRegExp("")
 
@@ -251,12 +261,15 @@ class PreferencesWindow(QtWidgets.QDialog):
         self._settings.endGroup()
 
         self._settings.beginGroup("Preferences/Music")
-        self._settings.setValue("library_portion", self.music_library.checkedId())
-        self._settings.setValue("user_selection", list(self.user_selection.keys()))
+        self._settings.setValue(
+            "library_portion", self.music_library.checkedId())
+        self._settings.setValue(
+            "user_selection", list(self.user_selection.keys()))
         self._settings.endGroup()
 
         self._settings.beginGroup("Preferences/Advanced")
-        self._settings.setValue("show_develop_menu", self.show_developer.isChecked())
+        self._settings.setValue(
+            "show_develop_menu", self.show_developer.isChecked())
         self._settings.endGroup()
 
     def readSettings(self):
@@ -272,18 +285,25 @@ class PreferencesWindow(QtWidgets.QDialog):
         self._settings.endGroup()
 
         self._settings.beginGroup("Preferences/Music")
-        portion = self._settings.value("library_portion", self.MUSIC_LIBRARY_ENTIRE)
+        portion = self._settings.value(
+            "library_portion", self.MUSIC_LIBRARY_ENTIRE)
         self.music_library.button(portion).setChecked(True)
 
         piece_ids = self._settings.value("user_selection", [])
         for pid in piece_ids:
             start = self._library_model.index(0, 0)
-            idxs = self._library_model.match(start, QtCore.Qt.UserRole + 1, pid, 1, QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
+            idxs = self._library_model.match(
+                start,
+                QtCore.Qt.UserRole + 1,
+                pid,
+                1,
+                QtCore.Qt.MatchExactly | QtCore.Qt.MatchRecursive)
             if len(idxs) > 0:
                 si = self._library_model.itemFromIndex(idxs[0])
                 si.setCheckState(QtCore.Qt.Checked)
         self._settings.endGroup()
 
         self._settings.beginGroup("Preferences/Advanced")
-        self.show_developer.setChecked(self._settings.value("show_develop_menu", False, type=bool))
+        self.show_developer.setChecked(
+            self._settings.value("show_develop_menu", False, type=bool))
         self._settings.endGroup()

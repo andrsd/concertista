@@ -2,10 +2,9 @@
 DeveloperAlbumsWindow.py
 """
 
-import io
-import yaml
 from PyQt5 import QtWidgets, QtCore, QtGui
 from concertista.PieceNameDialog import PieceNameDialog
+
 
 class DeveloperAlbumsWindow(QtWidgets.QMainWindow):
     """
@@ -49,7 +48,8 @@ class DeveloperAlbumsWindow(QtWidgets.QMainWindow):
 
         self._album_list.itemExpanded.connect(self.onAlbumExpanded)
 
-        self._save_shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+S"), self)
+        self._save_shortcut = QtWidgets.QShortcut(
+            QtGui.QKeySequence("Ctrl+S"), self)
         self._save_shortcut.activated.connect(self.onSave)
 
     def updateWidgets(self):
@@ -70,7 +70,9 @@ class DeveloperAlbumsWindow(QtWidgets.QMainWindow):
             album_tracks = self._spotify.album_tracks(album_data['id'])
             for track in album_tracks['items']:
                 ti = QtWidgets.QTreeWidgetItem(item)
-                ti.setText(0, "{:2d}. {}".format(track['track_number'], track['name']))
+                ti.setText(
+                    0,
+                    "{:2d}. {}".format(track['track_number'], track['name']))
                 ti.setData(0, QtCore.Qt.UserRole, track)
                 ti.setCheckState(0, QtCore.Qt.Unchecked)
                 item.addChild(ti)
@@ -83,8 +85,10 @@ class DeveloperAlbumsWindow(QtWidgets.QMainWindow):
     def onSave(self):
         items = []
         tracks = []
-        for item in self._album_list.findItems("", QtCore.Qt.MatchContains | QtCore.Qt.MatchRecursive):
-            if item.childCount() == 0 and item.checkState(0) == QtCore.Qt.Checked:
+        flags = QtCore.Qt.MatchContains | QtCore.Qt.MatchRecursive
+        for item in self._album_list.findItems("", flags):
+            if (item.childCount() == 0 and
+                    item.checkState(0) == QtCore.Qt.Checked):
                 tracks.append(item.data(0, QtCore.Qt.UserRole))
                 items.append(item)
 
@@ -130,7 +134,10 @@ class DeveloperAlbumsWindow(QtWidgets.QMainWindow):
             screen_rc = QtWidgets.QApplication.desktop().screenGeometry()
             wnd_wd = 750
             wnd_ht = int(0.9 * screen_rc.height())
-            self.setGeometry(QtCore.QRect(500, (screen_rc.height() - wnd_ht) / 2, wnd_wd, wnd_ht))
+            self.setGeometry(
+                QtCore.QRect(
+                    500, (screen_rc.height() - wnd_ht) / 2,
+                    wnd_wd, wnd_ht))
         else:
             self.restoreGeometry(geom)
         self._settings.endGroup()
@@ -154,7 +161,11 @@ class DeveloperAlbumsWindow(QtWidgets.QMainWindow):
 
         self._album_list.clear()
 
-        self._results = self._spotify.artist_albums(self._artist['id'], album_type='album', limit=50, country=self._market)
+        self._results = self._spotify.artist_albums(
+            self._artist['id'],
+            album_type='album',
+            limit=50,
+            country=self._market)
         all_albums = self._results['items']
         # while self._results['next']:
         #     self._results = self._spotify.next(self._results)
