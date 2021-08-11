@@ -2,12 +2,10 @@
 MainWindow.py
 """
 
-import os
 import sys
 import random
 import platform
 from PyQt5 import QtWidgets, QtCore, QtNetwork, QtGui
-from concertista import consts
 from concertista import server
 from concertista.assets import Assets
 from concertista.DB import DB
@@ -131,32 +129,24 @@ class MainWindow(QtWidgets.QMainWindow):
         button_h_layout.setContentsMargins(0, 0, 0, 0)
         button_h_layout.setSpacing(4)
 
-        self._prev_icon = QtGui.QIcon(
-            os.path.join(Assets().icons_dir, "prev.svg"))
         self._prev_button = QtWidgets.QPushButton()
-        self._prev_button.setIcon(self._prev_icon)
+        self._prev_button.setIcon(Assets().prev_icon)
         self._prev_button.setIconSize(QtCore.QSize(32, 32))
         self._prev_button.setFixedSize(QtCore.QSize(32, 32))
         self._prev_button.setStyleSheet("QPushButton {border:none}")
         self._prev_button.setEnabled(False)
         button_h_layout.addWidget(self._prev_button)
 
-        self._play_icon = QtGui.QIcon(
-            os.path.join(Assets().icons_dir, "play.svg"))
-        self._pause_icon = QtGui.QIcon(
-            os.path.join(Assets().icons_dir, "pause.svg"))
         self._play_pause_button = QtWidgets.QPushButton()
-        self._play_pause_button.setIcon(self._play_icon)
+        self._play_pause_button.setIcon(Assets().play_icon)
         self._play_pause_button.setIconSize(QtCore.QSize(32, 32))
         self._play_pause_button.setFixedSize(QtCore.QSize(32, 32))
         self._play_pause_button.setStyleSheet("QPushButton {border:none}")
         self._play_pause_button.setEnabled(False)
         button_h_layout.addWidget(self._play_pause_button)
 
-        self._next_icon = QtGui.QIcon(
-            os.path.join(Assets().icons_dir, "next.svg"))
         self._next_button = QtWidgets.QPushButton()
-        self._next_button.setIcon(self._next_icon)
+        self._next_button.setIcon(Assets().next_icon)
         self._next_button.setIconSize(QtCore.QSize(32, 32))
         self._next_button.setFixedSize(QtCore.QSize(32, 32))
         self._next_button.setStyleSheet("QPushButton {border:none}")
@@ -374,11 +364,11 @@ class MainWindow(QtWidgets.QMainWindow):
         if cpb['is_playing'] is True:
             self._spotify.pause_playback(device_id=self._active_device_id)
             self._play_pause.setText("Play")
-            self._play_pause_button.setIcon(self._play_icon)
+            self._play_pause_button.setIcon(Assets().play_icon)
         else:
             self._spotify.start_playback(device_id=self._active_device_id)
             self._play_pause.setText("Pause")
-            self._play_pause_button.setIcon(self._pause_icon)
+            self._play_pause_button.setIcon(Assets().pause_icon)
 
     def onNext(self):
         """
@@ -614,10 +604,10 @@ class MainWindow(QtWidgets.QMainWindow):
         if cpb is not None:
             if cpb['is_playing'] is True:
                 self._play_pause.setText("Pause")
-                self._play_pause_button.setIcon(self._pause_icon)
+                self._play_pause_button.setIcon(Assets().pause_icon)
             else:
                 self._play_pause.setText("Play")
-                self._play_pause_button.setIcon(self._play_icon)
+                self._play_pause_button.setIcon(Assets().play_icon)
 
             if ('item' in cpb) and (cpb['item'] is not None):
                 self._current_title = cpb['item']['name']

@@ -1,5 +1,6 @@
 import os
 import platform
+from PyQt5 import QtGui
 
 
 class Assets:
@@ -18,4 +19,11 @@ class Assets:
             path = os.path.dirname(__file__)
 
         self.music_dir = os.path.join(path, 'music')
-        self.icons_dir = os.path.join(path, 'icons')
+
+        icons_dir = os.path.join(path, 'icons')
+        self.author_icon = QtGui.QIcon(os.path.join(icons_dir, "author.svg"))
+        self.piece_icon = QtGui.QIcon(os.path.join(icons_dir, "vinyl.svg"))
+        self.prev_icon = QtGui.QIcon(os.path.join(icons_dir, "prev.svg"))
+        self.next_icon = QtGui.QIcon(os.path.join(icons_dir, "next.svg"))
+        self.play_icon = QtGui.QIcon(os.path.join(icons_dir, "play.svg"))
+        self.pause_icon = QtGui.QIcon(os.path.join(icons_dir, "pause.svg"))

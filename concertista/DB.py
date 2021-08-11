@@ -71,16 +71,11 @@ class DB:
                         print("Error loading file:", file)
 
     def _build_completer_model(self):
-        self._author_icon = QtGui.QIcon(
-            os.path.join(Assets().icons_dir, "author.svg"))
-        self._piece_icon = QtGui.QIcon(
-            os.path.join(Assets().icons_dir, "vinyl.svg"))
-
         self._completer_model = QtGui.QStandardItemModel()
 
         for id, composer in self._composers.items():
             si = QtGui.QStandardItem(
-                self._author_icon,
+                Assets().author_icon,
                 "{}".format(composer['name']))
             si.setData({"type": "composer", "id": id})
             self._completer_model.appendRow(si)
@@ -89,7 +84,7 @@ class DB:
 
         for id, piece in self._pieces.items():
             si = QtGui.QStandardItem(
-                self._piece_icon,
+                Assets().piece_icon,
                 "{}: {}".format(
                     piece['name'],
                     self._composers[piece['composer_id']]['name']))
