@@ -1,6 +1,7 @@
 import pytest
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
+
 
 def pytest_configure(config):
     # Ignore logging configuration for BeeRef during test runs. This

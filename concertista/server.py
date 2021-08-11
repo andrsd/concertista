@@ -1,5 +1,4 @@
 import os
-import uuid
 import webbrowser
 
 from flask import Flask, request, redirect
@@ -8,15 +7,14 @@ from dotenv import load_dotenv
 
 import spotipy
 import spotipy.util
-from spotipy.oauth2 import SpotifyOAuth
+
+from PyQt5 import QtCore
+from pathlib import Path
 
 load_dotenv()
 SPOTIFY_CLIENT_ID = os.getenv('SPOTIFY_CLIENT_ID')
 SPOTIFY_CLIENT_SECRET = os.getenv('SPOTIFY_CLIENT_SECRET')
 SPOTIFY_REDIRECT_URI = 'http://localhost:9182'
-
-from PyQt5 import QtCore
-from pathlib import Path
 
 # port where we run  our http server so we can talk to spotify
 port = int(os.environ.get("CONCERTISTA_PORT", 9182))
@@ -27,12 +25,18 @@ caches_folder = str(Path.home()) + '/.cache/concertista/'
 if not os.path.exists(caches_folder):
     os.makedirs(caches_folder)
 
+
 def session_cache_path():
     return caches_folder + 'spotify'
 
+
 @app.route('/')
 def index():
-    scope = 'user-read-playback-state user-modify-playback-state user-read-currently-playing'
+    scope = ' '.join([
+        'user-read-playback-state'
+        'user-modify-playback-state'
+        'user-read-currently-playing'
+    ])
     auth_manager = spotipy.oauth2.SpotifyOAuth(
         scope=scope,
         client_id=SPOTIFY_CLIENT_ID,
@@ -50,14 +54,16 @@ def index():
         # Send user to spotify authorization page
         auth_url = auth_manager.get_authorize_url()
         webbrowser.open_new(auth_url)
-        return f'Redirected to <a href="{auth_url}">Spotify authorization page</a>.'
+        return f'Redirected to '\
+               f'<a href="{auth_url}">Spotify authorization page</a>.'
 
     # Signed in, display info
     spotify = spotipy.Spotify(auth_manager=auth_manager)
     signaler.connectToSpotify.emit(spotify)
     return f'<center>'\
            f'<h1>Concertista</h1>' \
-           f'{spotify.me()["display_name"]}, access to your account was granted. <br/>' \
+           f'{spotify.me()["display_name"]}, '\
+           f'access to your account was granted. <br/>' \
            f'You can close this window, now.' \
            f'</center>'
 
@@ -84,5 +90,6 @@ class Signaler(QtCore.QObject):
     def __init__(self):
         super().__init__()
         pass
+
 
 signaler = Signaler()

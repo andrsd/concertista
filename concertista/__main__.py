@@ -3,12 +3,11 @@ Concertista
 """
 
 import sys
-import os
 import signal
 from concertista import consts
 from concertista import server
 
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt5 import QtWidgets, QtCore
 from concertista.MainWindow import MainWindow
 
 

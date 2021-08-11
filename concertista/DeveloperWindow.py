@@ -2,10 +2,10 @@
 DeveloperWindow.py
 """
 
-import yaml
 from PyQt5 import QtWidgets, QtCore, QtGui
 from concertista.DeveloperAlbumsWindow import DeveloperAlbumsWindow
 from concertista.PieceNameDialog import PieceNameDialog
+
 
 class DeveloperWindow(QtWidgets.QMainWindow):
     """
@@ -94,18 +94,21 @@ class DeveloperWindow(QtWidgets.QMainWindow):
 
         self.updateWidgets()
 
-        self._search_shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+Return"), self)
+        self._search_shortcut = QtWidgets.QShortcut(
+            QtGui.QKeySequence("Ctrl+Return"), self)
         self._search_shortcut.activated.connect(self.onCtrlReturn)
 
         self._composer_search_button.clicked.connect(self.onSearchComposer)
         self._composer_search_box.textChanged.connect(self.updateWidgets)
-        self._composer_list.itemDoubleClicked.connect(self.onComposerListDoubleClicked)
+        self._composer_list.itemDoubleClicked.connect(
+            self.onComposerListDoubleClicked)
 
         self._album_search_button.clicked.connect(self.onSearchAlbum)
         self._album_search_box.textChanged.connect(self.updateWidgets)
         self._album_list.itemExpanded.connect(self.onAlbumExpanded)
 
-        self._save_shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+S"), self)
+        self._save_shortcut = QtWidgets.QShortcut(
+            QtGui.QKeySequence("Ctrl+S"), self)
         self._save_shortcut.activated.connect(self.onSave)
 
     def updateWidgets(self):
@@ -131,7 +134,11 @@ class DeveloperWindow(QtWidgets.QMainWindow):
         self._composer_list.clear()
 
         srch_str = self._composer_search_box.text()
-        res = self._spotify.search(srch_str, limit=50, type='artist', market=self._market)
+        res = self._spotify.search(
+            srch_str,
+            limit=50,
+            type='artist',
+            market=self._market)
 
         root = self._composer_list.invisibleRootItem()
         for artist in res['artists']['items']:
@@ -165,7 +172,11 @@ class DeveloperWindow(QtWidgets.QMainWindow):
         self._album_list.clear()
 
         srch_str = self._album_search_box.text()
-        res = self._spotify.search(srch_str, limit=50, type='album', market=self._market)
+        res = self._spotify.search(
+            srch_str,
+            limit=50,
+            type='album',
+            market=self._market)
 
         root = self._album_list.invisibleRootItem()
         for album in res['albums']['items']:
@@ -198,7 +209,9 @@ class DeveloperWindow(QtWidgets.QMainWindow):
             album_tracks = self._spotify.album_tracks(album_data['id'])
             for track in album_tracks['items']:
                 ti = QtWidgets.QTreeWidgetItem(item)
-                ti.setText(0, "{:2d}. {}".format(track['track_number'], track['name']))
+                ti.setText(
+                    0,
+                    "{:2d}. {}".format(track['track_number'], track['name']))
                 ti.setData(0, QtCore.Qt.UserRole, track)
                 ti.setCheckState(0, QtCore.Qt.Unchecked)
                 item.addChild(ti)
@@ -214,8 +227,10 @@ class DeveloperWindow(QtWidgets.QMainWindow):
 
         items = []
         tracks = []
-        for item in self._album_list.findItems("", QtCore.Qt.MatchContains | QtCore.Qt.MatchRecursive):
-            if item.childCount() == 0 and item.checkState(0) == QtCore.Qt.Checked:
+        flags = QtCore.Qt.MatchContains | QtCore.Qt.MatchRecursive
+        for item in self._album_list.findItems("", flags):
+            if (item.childCount() == 0 and
+                    item.checkState(0) == QtCore.Qt.Checked):
                 tracks.append(item.data(0, QtCore.Qt.UserRole))
                 items.append(item)
 
@@ -262,7 +277,9 @@ class DeveloperWindow(QtWidgets.QMainWindow):
             screen_rc = QtWidgets.QApplication.desktop().screenGeometry()
             wnd_wd = 750
             wnd_ht = int(0.9 * screen_rc.height())
-            self.setGeometry(QtCore.QRect(10, (screen_rc.height() - wnd_ht) / 2, wnd_wd, wnd_ht))
+            self.setGeometry(QtCore.QRect(
+                10, (screen_rc.height() - wnd_ht) / 2,
+                wnd_wd, wnd_ht))
         else:
             self.restoreGeometry(geom)
         self._settings.endGroup()
