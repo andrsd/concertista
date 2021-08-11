@@ -42,6 +42,7 @@ def main():
     QtCore.QCoreApplication.setApplicationName(consts.APP_NAME)
 
     qapp = QtWidgets.QApplication(sys.argv)
+    qapp.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps)
     qapp.setQuitOnLastWindowClosed(False)
 
     server_thread = server.ServerThread()
