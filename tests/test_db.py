@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from concertista import consts
+from concertista.assets import Assets
 from concertista.DB import DB
 
 dir = Path(__file__).parent
@@ -16,7 +16,7 @@ def test_db_init(qtbot):
 
 
 def test_load_empty_db(qtbot):
-    consts.MUSIC_DIR = os.path.join(dir, 'assets', 'music-empty')
+    Assets().music_dir = os.path.join(dir, 'assets', 'music-empty')
     db = DB()
     db.load()
     assert db._composers == {}
@@ -26,7 +26,7 @@ def test_load_empty_db(qtbot):
 
 
 def test_load_simple_db(qtbot):
-    consts.MUSIC_DIR = os.path.join(dir, 'assets', 'music')
+    Assets().music_dir = os.path.join(dir, 'assets', 'music')
     db = DB()
     db.load()
 

@@ -5,11 +5,11 @@ MainWindow.py
 import os
 import sys
 import random
+import platform
+from PyQt5 import QtWidgets, QtCore, QtNetwork, QtGui
 from concertista import consts
 from concertista import server
-import platform
-
-from PyQt5 import QtWidgets, QtCore, QtNetwork, QtGui
+from concertista.assets import Assets
 from concertista.DB import DB
 from concertista.AboutDialog import AboutDialog
 from concertista.StationSearchDialog import StationSearchDialog
@@ -132,7 +132,7 @@ class MainWindow(QtWidgets.QMainWindow):
         button_h_layout.setSpacing(4)
 
         self._prev_icon = QtGui.QIcon(
-            os.path.join(consts.ICONS_DIR, "prev.svg"))
+            os.path.join(Assets().icons_dir, "prev.svg"))
         self._prev_button = QtWidgets.QPushButton()
         self._prev_button.setIcon(self._prev_icon)
         self._prev_button.setIconSize(QtCore.QSize(32, 32))
@@ -142,9 +142,9 @@ class MainWindow(QtWidgets.QMainWindow):
         button_h_layout.addWidget(self._prev_button)
 
         self._play_icon = QtGui.QIcon(
-            os.path.join(consts.ICONS_DIR, "play.svg"))
+            os.path.join(Assets().icons_dir, "play.svg"))
         self._pause_icon = QtGui.QIcon(
-            os.path.join(consts.ICONS_DIR, "pause.svg"))
+            os.path.join(Assets().icons_dir, "pause.svg"))
         self._play_pause_button = QtWidgets.QPushButton()
         self._play_pause_button.setIcon(self._play_icon)
         self._play_pause_button.setIconSize(QtCore.QSize(32, 32))
@@ -154,7 +154,7 @@ class MainWindow(QtWidgets.QMainWindow):
         button_h_layout.addWidget(self._play_pause_button)
 
         self._next_icon = QtGui.QIcon(
-            os.path.join(consts.ICONS_DIR, "next.svg"))
+            os.path.join(Assets().icons_dir, "next.svg"))
         self._next_button = QtWidgets.QPushButton()
         self._next_button.setIcon(self._next_icon)
         self._next_button.setIconSize(QtCore.QSize(32, 32))
