@@ -33,8 +33,8 @@ def session_cache_path():
 @app.route('/')
 def index():
     scope = ' '.join([
-        'user-read-playback-state'
-        'user-modify-playback-state'
+        'user-read-playback-state',
+        'user-modify-playback-state',
         'user-read-currently-playing'
     ])
     auth_manager = spotipy.oauth2.SpotifyOAuth(
