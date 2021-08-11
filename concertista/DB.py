@@ -3,7 +3,7 @@ DB.py
 """
 import os
 import yaml
-from concertista import consts
+from concertista.assets import Assets
 from PyQt5 import QtCore, QtGui
 
 
@@ -41,7 +41,7 @@ class DB:
 
     def _load_composers(self):
         composers = []
-        fn = consts.MUSIC_DIR + '/composers.yml'
+        fn = Assets().music_dir + '/composers.yml'
         with open(fn, 'rt', encoding="utf-8") as f:
             composers = yaml.safe_load(f)
 
@@ -51,7 +51,7 @@ class DB:
                 self._composers[id] = c
 
     def _load_pieces(self):
-        for root, dirs, files in os.walk(consts.MUSIC_DIR + "/tracks"):
+        for root, dirs, files in os.walk(Assets().music_dir + "/tracks"):
             root.split(os.sep)
             for file in files:
                 if file.endswith(('.yml')):
@@ -71,16 +71,11 @@ class DB:
                         print("Error loading file:", file)
 
     def _build_completer_model(self):
-        self._author_icon = QtGui.QIcon(
-            os.path.join(consts.ICONS_DIR, "author.svg"))
-        self._piece_icon = QtGui.QIcon(
-            os.path.join(consts.ICONS_DIR, "vinyl.svg"))
-
         self._completer_model = QtGui.QStandardItemModel()
 
         for id, composer in self._composers.items():
             si = QtGui.QStandardItem(
-                self._author_icon,
+                Assets().author_icon,
                 "{}".format(composer['name']))
             si.setData({"type": "composer", "id": id})
             self._completer_model.appendRow(si)
@@ -89,7 +84,7 @@ class DB:
 
         for id, piece in self._pieces.items():
             si = QtGui.QStandardItem(
-                self._piece_icon,
+                Assets().piece_icon,
                 "{}: {}".format(
                     piece['name'],
                     self._composers[piece['composer_id']]['name']))

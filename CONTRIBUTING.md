@@ -45,10 +45,14 @@ Open `htmlcov/index.html`
 
 ## Building the app
 
-To build the app, run:
-
+**On MacOS X:**
 ```
-python build.py
+python setup.py py2app
+```
+
+**On Windows:**
+```
+TODO
 ```
 
 This will create a distributable in `dist` directory.
