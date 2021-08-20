@@ -21,13 +21,13 @@ port = int(os.environ.get("CONCERTISTA_PORT", 9182))
 
 app = Flask(__name__)
 
-caches_folder = str(Path.home()) + '/.cache/concertista/'
+caches_folder = os.path.join(str(Path.home()), '.cache', 'concertista')
 if not os.path.exists(caches_folder):
     os.makedirs(caches_folder)
 
 
 def session_cache_path():
-    return caches_folder + 'spotify'
+    return os.path.join(caches_folder, 'spotify')
 
 
 @app.route('/')

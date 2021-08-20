@@ -41,7 +41,7 @@ class DB:
 
     def _load_composers(self):
         composers = []
-        fn = Assets().music_dir + '/composers.yml'
+        fn = os.path.join(Assets().music_dir, 'composers.yml')
         with open(fn, 'rt', encoding="utf-8") as f:
             composers = yaml.safe_load(f)
 
@@ -51,12 +51,13 @@ class DB:
                 self._composers[id] = c
 
     def _load_pieces(self):
-        for root, dirs, files in os.walk(Assets().music_dir + "/tracks"):
+        tracks_dir = os.path.join(Assets().music_dir, "tracks")
+        for root, dirs, files in os.walk(tracks_dir):
             root.split(os.sep)
             for file in files:
                 if file.endswith(('.yml')):
                     try:
-                        fn = root + '/' + file
+                        fn = os.path.join(root, file)
                         with open(fn, 'rt', encoding="utf-8") as f:
                             piece = yaml.safe_load(f)
 
