@@ -45,14 +45,8 @@ Open `htmlcov/index.html`
 
 ## Building the app
 
-**On MacOS X:**
 ```
-python setup.py py2app
-```
-
-**On Windows:**
-```
-TODO
+pyinstaller Concertista.spec
 ```
 
 This will create a distributable in `dist` directory.

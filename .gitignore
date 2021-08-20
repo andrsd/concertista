@@ -5,14 +5,10 @@
 *.egg-info/
 .env
 
-# py2app
 .eggs/*
 venv/*
-icon.icns
 dist/*
 build/*
-# pyinstaller
-*.spec
 
 # garbagge created by me
 tmp/*
