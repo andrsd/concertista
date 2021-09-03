@@ -27,3 +27,5 @@ class Assets:
         self.next_icon = QtGui.QIcon(os.path.join(icons_dir, "next.svg"))
         self.play_icon = QtGui.QIcon(os.path.join(icons_dir, "play.svg"))
         self.pause_icon = QtGui.QIcon(os.path.join(icons_dir, "pause.svg"))
+
+        self.spotify_logo = QtGui.QIcon(os.path.join(icons_dir, "spotify-logo.svg"))

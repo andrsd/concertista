@@ -25,8 +25,8 @@ class MainWindow(QtWidgets.QMainWindow):
     Main window
     """
 
-    ALBUM_IMAGE_WD = 96
-    ALBUM_IMAGE_HT = 96
+    ALBUM_IMAGE_WD = 128
+    ALBUM_IMAGE_HT = 128
 
     VOLUME_PAGE_STEP = 5
     VOLUME_MINIMUM = 0
@@ -105,6 +105,12 @@ class MainWindow(QtWidgets.QMainWindow):
         top_layout.setContentsMargins(0, 0, 0, 0)
         top_layout.setSpacing(2)
 
+        self._spotify_logo = QtWidgets.QLabel()
+        self._spotify_logo.setPixmap(Assets().spotify_logo.pixmap(80, 24))
+        top_layout.addWidget(self._spotify_logo)
+
+        top_layout.addSpacing(8)
+
         self._title = QtWidgets.QLabel("")
         font = self._title.font()
         font.setBold(True)
@@ -169,6 +175,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self._device_combo_box = QtWidgets.QComboBox()
         bottom_h_layout.addWidget(self._device_combo_box)
+
         bottom_h_layout.setContentsMargins(0, 0, 0, 0)
 
         top_layout.addLayout(bottom_h_layout)
