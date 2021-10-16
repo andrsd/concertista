@@ -33,8 +33,10 @@ jobs:
       - name: Run pytest
         run: |
           xvfb-run --auto-servernum --server-num=1 --server-args="-screen 1 1920x1200x24 -ac +extension GLX" coverage run --source=concertista -m pytest -v -s
-      - name: Codecov
-        uses: codecov/codecov-action@v2
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ubuntu-coverage
+          path: coverage.xml
 
   macos:
     runs-on: macos-latest
@@ -54,8 +56,10 @@ jobs:
         run: |
           coverage run --source=concertista -m pytest -v -s
           coverage xml
-      - name: Codecov
-        uses: codecov/codecov-action@v2
+      - uses: actions/upload-artifact@v2
+        with:
+          name: macos-coverage
+          path: coverage.xml
 
   windows:
     runs-on: windows-latest
@@ -74,3 +78,18 @@ jobs:
       - name: Run pytest
         run: |
           coverage run --source=concertista -m pytest -v -s
+      - uses: actions/upload-artifact@v2
+        with:
+          name: windows-coverage
+          path: coverage.xml
+
+  upload-to-codecov:
+    needs: [linux, macos, windows]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v1
