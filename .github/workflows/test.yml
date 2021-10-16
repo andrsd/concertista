@@ -10,16 +10,18 @@ on:
 
 jobs:
   build:
+    env:
+      XDG_RUNTIME_DIR: /tmp/runtime-builduser
     runs-on: ubuntu-latest
     name: ubuntu
     steps:
-      - name: checkout source
+      - name: cCheckout source
         uses: actions/checkout@v2
-      - name: set up python
+      - name: Set up python
         uses: actions/setup-python@v1
         with:
           python-version: 3.8
-      - name: install dependencies
+      - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt install libgl1-mesa-glx libegl1 libglib2.0-0 libxcb-image0 libxkbcommon-x11-0 libxcb-icccm4 libxcb-keysyms1 xserver-xephyr libfontconfig1 libxkbcommon-dev libdbus-1-3 libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xfixes0
@@ -27,8 +29,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install .
           pip install -r requirements/test.txt
-      - name: pytest
+          mkdir -p /tmp/runtime-builduser
+      - name: Run pytest
         run: |
           xvfb-run --auto-servernum --server-num=1 --server-args="-screen 1 1920x1200x24 -ac +extension GLX" coverage run --source=concertista -m pytest -v -s
-      - name: codecov
+      - name: Codecov
         uses: codecov/codecov-action@v1

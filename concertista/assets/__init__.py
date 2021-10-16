@@ -1,5 +1,6 @@
 import os
 import sys
+import platform
 from PyQt5 import QtGui
 
 
@@ -15,6 +16,8 @@ class Assets:
     def on_new(self):
         if getattr(sys, 'frozen', False):
             path = sys._MEIPASS
+        elif platform.system() == "Darwin":
+            path = os.environ.get('RESOURCEPATH', os.path.dirname(__file__))
         else:
             path = os.path.dirname(__file__)
 
