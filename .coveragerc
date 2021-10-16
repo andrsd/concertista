@@ -2,6 +2,9 @@
 source=concertista
 omit =
     concertista/__main__.py
+    concertista/Developer*.py
+    concertista/PieceNameDialog.py
+    concertista/server.py
 
 [report]
 exclude_lines =
@@ -13,7 +16,3 @@ exclude_lines =
     raise NotImplementedError
     if 0:
     if __name__ == .__main__.:
-omit =
-  concertista/Developer*.py
-  concertista/PieceNameDialog.py
-  concertista/server.py
