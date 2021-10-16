@@ -16,3 +16,4 @@ exclude_lines =
 omit =
   concertista/Developer*.py
   concertista/PieceNameDialog.py
+  concertista/server.py
