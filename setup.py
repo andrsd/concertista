@@ -66,7 +66,7 @@ setup(
         'PyQt5==5.13.1',
         'pyaml==20.4.0',
         'spotipy==2.22.1',
-        'Flask==2.0.1',
+        'Flask==2.3.2',
         'waitress==2.1.2',
         'python-dotenv>=0.15.0'
     ],
