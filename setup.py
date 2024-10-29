@@ -67,7 +67,7 @@ setup(
         'pyaml==20.4.0',
         'spotipy==2.22.1',
         'Flask==2.3.2',
-        'waitress==2.1.2',
+        'waitress==3.0.1',
         'python-dotenv>=0.15.0'
     ],
     packages=[
