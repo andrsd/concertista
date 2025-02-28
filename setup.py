@@ -65,7 +65,7 @@ setup(
     install_requires=[
         'PyQt5==5.13.1',
         'pyaml==20.4.0',
-        'spotipy==2.22.1',
+        'spotipy==2.25.1',
         'Flask==2.3.2',
         'waitress==3.0.1',
         'python-dotenv>=0.15.0'
